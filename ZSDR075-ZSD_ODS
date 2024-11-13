@@ -1,0 +1,2906 @@
+*&---------------------------------------------------------------------*
+*&  PROGRAM                               @Goodrich Aerostructures     *
+*&                                                                     *
+*&  Type: ALV Report                                                   *
+*&                                                                     *
+*&  Run Frequency:                                                     *
+*&                                                                     *
+*&                                                                     *
+*&  Description:                                                       *
+*&                                                                     *
+*&  Functional Specification:                                          *
+*&  Technical  Specification:                                          *
+*&                                                                     *
+*&**********************************************************************
+*&  CHANGE HISTORY:                                                    *
+*&                          Change                                     *
+*&  Date      Author        Driver         Description                 *
+*& 09/07/2004 Joe Brooks    Issue 2847     Open Deliveries             *
+*&                          D01K926954                                 *
+*&                          D01K926956                                 *
+*& 09/13/2004 Joe Brooks    D01K926980     Allow User to save Layout   *
+*& 09/23/2004 Joe Brooks    D01K927118     Add 2 fields to Selection   *
+*& 01/16/2006 KS Ong        D02K900230     MPN Changes                 *
+*& 07/18/2006 Bambang       D01K936015     CR4565 Open deliveries:     *
+*&                                         Make S_VSTEL mandatory      *
+*&                                         check VSTEL for auth check  *
+*& 07/16/2007 EX88845       D02K910990     To include Line item Value  *
+*&                                         (Issue CR6366)              *
+*& 08/14/2007 Ruskin Rayen  D02K912272     Fix extended price logic    *
+*& 08/29/2007 Joe Brooks    D02K912777     display sales document      *
+*&                                         currency type & Remove      *
+*&                                         deliveries LE Zero          *
+*& 10/15/2007 Jai Ko                       Display only one line per   *
+*&                                         one delivey&line item       *
+*& 10/24/2007 Jai Ko        D02K914179     Check deliv.date(VBEP-EDATU)*
+*& 10/25/2007 Jai Ko        D02K914217     Check if i_zsdr075 is blnak *
+*& 11/15/2007 Jai Ko        D02K914736     Add 'BINARY SEARCH'         *
+*& 04/07/2008 Jwwan         D02K916816     Change selection screen and *
+*&                                         added/remove fields to the  *
+*&                                         report layout and its       *
+*&                                         contents. Perfomed fine     *
+*&                                         tuning on the codes.        *
+*& 06/18/2008 G9008190      D02K918904     Reporting adjustments on new*
+*&                                         field zzmps_date   .        *
+*& 12/18/2008 W Kamal       D01K950731     Add fields on screen & rept.*
+*& 01/21/2009 W Kamal       D01K951261     1.Remove Confirmed Qty colmn*
+*&                                         2.Change Hdrs for NAME1     *
+*& 02/03/2009 W Kamal       D01K951567     Add VBAP-POSEX to sel scrn. *
+*& 02/13/2009 W Kamal       D01K951830     Add VBKD-BSTKD to sel scrn. *
+*& 03/20/2009 Eunise        D01K952807     1.MFRPN sel screen decr     *
+*&                                         2.Show info for pick status *
+*&                                         3.Change column title       *
+*&                                         4.Add column VTTK-BEZEI     *         *
+*&                                         5.Change "ROUTE" column     *
+*&                                         6.Get del. method from      *
+*&                                           tbl "T173T"               *
+*&                                         7.delete column "customer"  *
+*& 07/03/2009 Lee Wen       D01K955374     Fix second creation date    *
+*&                          erfs 583280    references VBAK-ERDAT       *
+*& 07/09/2009 SM Kek        D01K955476     Rename second creation date *
+*&                          erfs 583280    header to SO Created On     *
+*& 09/23/2009 WL Tham       DP1K906600     Fix Net value and ext price *
+*&                                         calculation for sales uom   *
+*& 11/02/2009 SM Kek        DP1K908448     Fix matnr filtering of the  *
+*&                          erfs 687756    report                      *
+*&                          erfs 689204    Add sales office and desc   *
+*& 11/05/2009 SM Kek        DP1K908649     Fix limited memory runtime  *
+*&                          erfs 689204    error                       *
+*& 11/13/2009 Jai Ko        DP1K908978     Add KNVV-INCO1, KNVV-INCO2 to
+*&                                         the structure to display    *
+*& 01/07/2010 Jai Ko        DP1K910186     Add 'ZLO' delv. type to get data
+*& 02/05/2010 SM Kek        DP1K911229     Add LIPS-MBDAT              *
+*&                          erfs 750429                                *
+*& 05/25/2010 WL Tham       D01K957024     Perf Tuning - Remove referen*
+*&                          erfs 806163    ces to VEKP/VEPO            *
+*& 06/01/2010 WL Tham       D01K957290     Selscreen opt to exclude deliv
+*&                          erfs 872475    with delivery block set     *
+*& 09/08/2010 Sherry Carter D01K959893     Use Incoterms from delivery *
+*&                          erfs 815278    record (LIKP)               *
+*& 02/24/2011 Craig Davis   DP1K917344     Make delivery type and goods*
+*&                          erfs 986220    movement date required input*
+*&                                         so index LIKP-Z1 is used.   *
+*& 03/15/2011 Craig Davis   DP1K918034     Goods movement date of blank*
+*&                          erfs 1148213   is added to selection screen*
+*&                                         for all delivery types.     *
+*& 06/10/2011 J Mathieson   D01K963580     Add field VBAK-KVGR3 to     *
+*&                          eRFS1257679    ALV output                  *
+*& 05/17/2012 J Mathieson   D01K971394     Add fields MVKE-VMSTA/VMSTD *
+*&            (0066477)     eRFS1729337    to ALV output               *
+*& 06/26/2012 Jeff C        DP1K928312     Add field VBAP-VKAUS to ALV *
+*&                          CR1743336                                  *
+*& 09/13/2012  J Mathieson  DP1K930895     Add field VBAP-AUDAT to ALV *
+*&             (0066477)    eRFS1995122                                *
+*& 04/03/2013  A Oliver     D01K976509     Enable User-specific ALV    *
+*&                          eRFS2294390                                *
+*& 05/07/2013  T.Lopez      DP1K936312     Translation Improvement     *
+*&                          eRFS2226771                                *
+*& 03/23/2015  J.Garcia     DP1K952418     Add VBAK-KVGR1 to output    *
+*&            (8084548)   INC000010016125  ALV                         *
+*& 02/25/2016  P.Phelan     DP1K969749     Add Picked and Goods        *
+*&                          INC12861958    Movement dates from VBFA    *
+*& 03/28/2016  P.Phelan     DP1K971205     Changed to pull AEDAT from  *
+*&                          INC12861958    LIKP, not LIPS              *
+*& 04/15/2016  P.Phelan     DP1K971972     Add Shipto Country to report*
+*&                          INC13279733                                *
+*& 06/01/2016  P.Phelan     DP1K973763     Add Transfer Order (tanum)  *
+*&                          INC13326996    and Entry Time (erzet)      *
+*&                          INC13454263    to report                   *
+*& 06/16/2016  P.Phelan     DP1K974368     Fix performance issue intro-*
+*&                          INC13700560    duced with the last enhance-*
+*&                                         ment.                       *
+*& 06/21/2016  P.Phelan     DP1K974565     Fix performance issue...had *
+*&                          INC13700560    "ENDIF" out of place        *
+*& 08/01/2016  P.Phelan     DP1K976029     Fix "Forwarding Agent" on   *
+*&                          INC13788799    ZSC_ODS report.             *
+*& 01/31/2019  P.Phelan     D01K9A0BRO     Add zzaircraft,             *
+*&                          INC0407031     z_cus_ondock_date,          *
+*&                                         z_cus_ship_date, and        *
+*&                                         z_pr_ondock_date to report  *
+*& 02/16/2022  Isaac Delly  DP1K9A0CVJ     add 'Customer PO' column    *
+*& 02/16/2023  100040001729 D01K9A0G6K     Add sort on i_shipment as   *
+*&                                         shipment details are not passing*
+*&                                         to final internal table     *
+*&**********************************************************************
+*&  INPUTS                                                             *
+*&                                                                     *
+*&  Files:               n/a                                           *
+*&                                                                     *
+*&  Sort Fields:         n/a                                           *
+*&                                                                     *
+*&  Other:               n/a                                           *
+*&**********************************************************************
+*&  OUTPUTS                                                            *
+*&                                                                     *
+*&  Files:                                                             *
+************************************************************************
+*&                                                                     *
+*&  Errors:                                                            *
+*&                                                                     *
+*&  Exit Points:                                                       *
+*&                                                                     *
+*&  Other:                                                             *
+*&**********************************************************************
+*&  REFERENCES                                                         *
+*&                                                                     *
+*&  Transaction:     ZSD_ODS                                           *
+*&                                                                     *
+*&  Structures:                                                        *
+*&                                                                     *
+*&  Function Modules:                                                  *
+*&                                                                     *
+*&  Other:               n/a                                           *
+*&**********************************************************************
+
+************************************************************************
+* 2/15/24 smartShift project
+* Rule ids applied: #822 #826
+************************************************************************
+
+REPORT zsdr075  NO STANDARD PAGE HEADING
+                             LINE-SIZE 132         "LANDSCAPE
+                             LINE-COUNT 65(2)      "SPACE FOR FOOTER
+                             MESSAGE-ID zx.
+
+************************************************************************
+*              D A T A B A S E   T A B L E S                           *
+************************************************************************
+*&&---DEFINE APPLICATION SPECIFIC TABLE(S) HERE------------------------
+TABLES: likp,
+        lips,
+        ltap,                                               "DP1K973763
+        vbup,
+        vbak,
+        vbap,                                               "D01K951567
+        vbkd,                                               "D01K951830
+        vbfa,                                               "DP1K969749
+*        vepo,                                              "-D01K957024
+*        vekp,                                              "-D01K957024
+        vbep,
+        vbpa,                                               "DP1K971972
+        adrc,                                               "DP1K971972
+        vttk,                                         "D02K916816 - ADD
+        mara,                                               "D02K900230
+        mvke.                                               "D01K950731
+************************************************************************
+*              I N C L U D E S                                         *
+************************************************************************
+*&&------Add common includes
+INCLUDE zdisplay_status.
+
+************************************************************************
+*          OUTPUT FILES AND APPLICATION SPECIFIC STRUCTURES            *
+************************************************************************
+*----------------------DEFINE OUTPUT FILE(S)---------------------------*
+* These are the UNIX files that the SAP information will be written to.
+
+
+************************************************************************
+*              T Y P E   P O O L S                                     *
+************************************************************************
+TYPE-POOLS: slis.
+
+
+************************************************************************
+*              I N T E R N A L   T A B L E S                           *
+************************************************************************
+*-----DEFINE APPLICATION-SPECIFIC STRUCTURES HERE----------------------*
+
+** Begin EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+DATA : BEGIN OF s_zsdr075.
+    INCLUDE STRUCTURE zsdr075.
+DATA : mfrpn TYPE mara-mfrpn,
+       charg TYPE lips-charg.
+* Begin add of D02K916816, (CR211867)
+DATA: tknum           TYPE vttk-tknum,
+      tndr_trkid      TYPE vttk-tndr_trkid,
+      kodat           TYPE likp-kodat,
+      manifestnum     TYPE zsde004_05-manifestnum,
+      podat           TYPE likp-podat,
+      zdelv_text(128) TYPE c.
+* End add of D02K916816, (CR211867)
+* Begin add of D02K918904, CR209067 at 06/18/08 (G9008190).
+DATA: zzmpsdate TYPE vbap-zzmpsdate.
+* End of D02K918904, CR209067 at 06/18/08 (G9008190).
+*& start - D01K950731 by G9008586 (W Kamal) on 12/18/08
+DATA: mvgr4      LIKE mvke-mvgr4,
+      kunag      LIKE likp-kunag,
+      name2      LIKE kna1-name1,
+      kunwe      LIKE likp-kunnr,
+      vkorg      LIKE likp-vkorg,
+      spdnr      LIKE vepvg-spdnr,
+      wadat_p    LIKE likp-wadat,
+      arktx      LIKE lips-arktx,
+      matwa      LIKE lips-matwa,
+      vrkme      LIKE lips-vrkme,
+      kzwi1      LIKE vbap-kzwi1,
+      pstyv      LIKE lips-pstyv,
+      vtweg      LIKE lips-vtweg,
+      spart      LIKE lips-spart,
+      posex      LIKE vbap-posex,
+*      vepos     LIKE vepo-vepos,                              "-D01K957024
+      zzaircraft LIKE   vbap-zzaircraft,
+*& end - D01K950731 by G9008586 (W Kamal) on 12/18/08
+*Begin of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+*Add fields for net price calculation
+      kzwi3      TYPE vbap-kzwi3,
+      kwmeng     TYPE vbap-kwmeng.
+*End of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+
+DATA: bstkd     LIKE vbkd-bstkd.                            "D01K951830
+
+*& start - D01K952807 by G9010248 (Eunise) on 03/20/09
+*Add column to ALV grid to display VTTK-BEZEI titles "Route" and T173T-BEZEI titled "Delv Mthd"
+DATA: vsart TYPE vttk-vsart.
+DATA: bezei TYPE tvrot-bezei.
+DATA: vsbezei TYPE t173t-bezei.
+*& end - D01K952807 by G9010248 (Eunise) on 03/20/09
+
+*Start DP1K908448 G9010249 11/02/2009
+* Add sales office and its description to the report output
+DATA: vkbur      TYPE vbak-vkbur,
+      vkbur_text TYPE tvkbt-bezei.
+*End DP1K908448 G9010249 11/02/2009
+DATA: inco1 TYPE knvv-inco1,                                "DP1K908978
+      inco2 TYPE knvv-inco2.                                "DP1K908978
+* D01K959893 add this code for incoterms
+DATA: inco1_d TYPE likp-inco1,                " D01K959893
+      inco2_d TYPE likp-inco2.                " D01K959893
+DATA: mbdat TYPE lips-mbdat.                          "ADD-DP1K911229
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+DATA: lifsk      TYPE likp-lifsk,
+      lifsk_text TYPE tvlst-vtext,
+      cmgst      TYPE vbuk-cmgst,
+      cmgst_text TYPE dd07t-ddtext.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+* Add Freight Terms to data selection - CTD 02/24/11
+DATA: sdabw      TYPE likp-sdabw.
+
+*& Begin Change - D01K9A0BRO
+DATA: zzaircraft_lips   TYPE lips-zzaircraft,
+      z_cus_ondock_date TYPE lips-z_cus_ondock_date,
+      z_cus_ship_date   TYPE lips-z_cus_ship_date,
+      z_pr_ondock_date  TYPE lips-z_pr_ondock_date.
+*& End Change - D01K9A0BRO
+DATA: cust_bstkd TYPE vbkd-bstkd.                           "DP1K9A0CVJ
+DATA : END OF s_zsdr075.
+
+*& Begin Change - DP1K976029
+**& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+*DATA: BEGIN OF s_vepvg,
+*        vstel     LIKE vepvg-vstel,
+*        vbeln     LIKE vepvg-vbeln,
+*        spdnr     LIKE vepvg-spdnr,
+*      END OF s_vepvg.
+
+DATA: BEGIN OF s_vbpa,
+        vbeln LIKE vbpa-vbeln,
+        lifnr LIKE vbpa-lifnr,
+      END OF s_vbpa.
+*& End Change - DP1K976029
+
+DATA: BEGIN OF s_mvke,
+        matnr LIKE mvke-matnr,
+        vkorg LIKE mvke-vkorg,
+        vtweg LIKE mvke-vtweg,
+        vmsta LIKE mvke-vmsta,                              "D01K971394
+        vmstd LIKE mvke-vmstd,                              "D01K971394
+        mvgr4 LIKE mvke-mvgr4,
+      END OF s_mvke.
+
+DATA: BEGIN OF s_user,
+        bname      LIKE usr21-bname,
+*        persnumber    LIKE usr21-persnumber,
+        name_first LIKE adrp-name_first,
+        name_last  LIKE adrp-name_last,
+      END OF s_user.
+* Begin insert by Jai Ko : DP1K908978
+DATA: BEGIN OF s_knvv,
+        kunnr LIKE knvv-kunnr,
+        vkorg LIKE knvv-vkorg,
+        vtweg LIKE knvv-vtweg,
+        spart LIKE knvv-spart,
+        inco1 LIKE knvv-inco1,
+        inco2 LIKE knvv-inco2,
+      END OF s_knvv.
+* End insert by Jai Ko : DP1K908978
+*DATA: i_vepvg LIKE TABLE OF s_vepvg WITH HEADER LINE.      "DP1K976029
+DATA: i_vbpa  LIKE TABLE OF s_vbpa  WITH HEADER LINE.       "DP1K976029
+DATA: i_mvke LIKE TABLE OF s_mvke WITH HEADER LINE.
+DATA: i_user LIKE TABLE OF s_user WITH HEADER LINE.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+* Begin of change - D01K971394
+DATA: i_tvmst TYPE TABLE OF tvmst,
+      s_tvmst TYPE tvmst.
+* End of change - D01K971394
+
+*& start - D01K951830 by G9008586 (W Kamal) on 02/13/09
+DATA: BEGIN OF s_vbkd,
+        vbeln      LIKE vbkd-vbeln,
+        posnr      LIKE vbkd-posnr,
+        bstkd      LIKE vbkd-bstkd,
+        cust_bstkd LIKE vbkd-bstkd,                         "DP1K9A0CVJ
+      END OF s_vbkd.
+
+DATA: i_vbkd LIKE TABLE OF s_vbkd WITH HEADER LINE.
+*& end - D01K951830 by G9008586 (W Kamal) on 02/13/09
+DATA: i_vbkd_temp LIKE TABLE OF s_vbkd WITH HEADER LINE.    "DP1K9A0CVJ
+
+* Begin of change - D01K963580 - add new field.  Not added to structure
+* so doesn't affect other program using same structure.
+TYPES: BEGIN OF t_zsdr075.
+    INCLUDE STRUCTURE s_zsdr075.
+TYPES: kvgr1     TYPE kvgr1,   "Add in DP1K952418 J.Garcia
+       kvgr3     TYPE kvgr3,
+       vmstb     TYPE txt25,  "Text field to concatenate VMSTA - VMSTB  "D01K971394
+       vmstd     TYPE vmstd,                                "D01K971394
+       vkaus     TYPE vbap-vkaus,                             "+DP1K928312
+       vkaus_dis TYPE char30, "vkaus - bezei              "+DP1K928312
+       audat     TYPE audat_pos,                            "DP1K930895
+       pickdt    TYPE vbfa-erdat,                           "DP1K969749
+       movedt    TYPE vbfa-erdat,                           "DP1K969749
+       aedat     TYPE likp-aedat,                           "DP1K971205
+       country   TYPE adrc-country,                         "DP1K971972
+       tanum     TYPE ltap-tanum,                           "DP1K973763
+       erzet     TYPE likp-erzet,                           "DP1K973763
+       lgnum     TYPE t320-lgnum,                           "DP1K974368
+       END OF t_zsdr075.
+* End of change - D01K963580
+
+DATA: i_likp  LIKE TABLE OF s_zsdr075 WITH HEADER LINE,
+      i_vbup  LIKE TABLE OF s_zsdr075 WITH HEADER LINE,
+      i_vbep  LIKE TABLE OF s_zsdr075 WITH HEADER LINE,
+*      i_vepo LIKE TABLE OF s_zsdr075 WITH HEADER LINE,     "-D01K957024
+*      i_out  LIKE TABLE OF s_zsdr075 WITH HEADER LINE,     "D01K963580
+      i_tvlvt TYPE STANDARD TABLE OF tvlvt,                 "+DP1K928312
+      i_out   TYPE TABLE OF t_zsdr075 WITH HEADER LINE,     "D01K963580
+      i_knvv  LIKE TABLE OF s_knvv    WITH HEADER LINE.     "DP1K908978
+* Begin of change - D01K963580
+*      i_zsdr075 LIKE TABLE OF s_zsdr075 WITH HEADER LINE.
+DATA:  i_zsdr075 TYPE TABLE OF t_zsdr075 WITH HEADER LINE.
+DATA:  i_vbeln TYPE TABLE OF t_zsdr075 WITH HEADER LINE.
+
+* Not used in program, comment out with new type above
+*DATA: BEGIN OF t_zsdr075 OCCURS 0.
+*        INCLUDE STRUCTURE zsdr075.
+*DATA : mfrpn TYPE mara-mfrpn,
+*       charg TYPE lips-charg.
+*DATA : END OF t_zsdr075.
+* End of change - D01K963580
+
+CONSTANTS: c_structure_name(30) VALUE 'ZSDR075_TMP'.  "D02K916816-CHG
+
+* Begin add of D02K916816, (CR211867)
+TYPES:
+  BEGIN OF t_lips,
+    vbeln TYPE lips-vbeln,
+    posnr TYPE lips-posnr,
+    vgbel TYPE lips-vgbel,
+    vgpos TYPE lips-vgpos,
+    vtweg TYPE lips-vtweg,
+    aufnr TYPE lips-aufnr,
+    uecha TYPE lips-uecha,
+  END OF t_lips,
+
+*& Begin Change - DP1K969749
+  BEGIN OF t_vbfa,
+    vbelv   TYPE vbfa-vbelv,
+    posnv   TYPE vbfa-posnv,
+    vbtyp_n TYPE vbfa-vbtyp_n,
+    erdat   TYPE vbfa-erdat,
+    erzet   TYPE vbfa-erzet,
+  END OF t_vbfa,
+*& End Change - DP1K969749
+* End add of D02K916816, (CR211867)
+
+*& Begin of Changes - DP1K971972
+  BEGIN OF t_shipto_country,
+    vbeln   TYPE vbpa-vbeln,
+*    posnr TYPE vbpa-posnr,
+    country TYPE adrc-country,
+  END OF t_shipto_country,
+*& End of Changes - DP1K971972
+
+*& Begin of Change - DP1K973763
+  BEGIN OF t_ltap,
+    vbeln TYPE ltap-vbeln,
+    tanum TYPE ltap-tanum,
+  END OF t_ltap.
+*& End Of Change - DP1K973763
+
+*DATA: tmp_summary LIKE TABLE OF s_zsdr075 WITH HEADER LINE,    "D01K963580
+DATA: tmp_summary      TYPE TABLE OF t_zsdr075 WITH HEADER LINE, "D01K963580
+      tsum             LIKE TABLE OF zsdr075 WITH HEADER LINE,
+      t_tmp            LIKE zsdr075,
+* Begin change of D02K916816, (CR211867)
+      xlips            TYPE STANDARD TABLE OF t_lips,
+      vlips            LIKE LINE OF xlips,
+      i_vbfa           TYPE STANDARD TABLE OF t_vbfa,       "DP1K969749
+      w_vbfa           LIKE LINE OF i_vbfa,                 "DP1K969749
+      i_shipto_country TYPE STANDARD TABLE OF t_shipto_country, "DP1K971972
+      w_shipto_country LIKE LINE OF i_shipto_country,       "DP1K971972
+      i_ltap           TYPE STANDARD TABLE OF t_ltap,       "DP1K973763
+      w_ltap           LIKE LINE OF i_ltap,                 "DP1K973763
+      i_t320           TYPE STANDARD TABLE OF t320,         "DP1K974368
+      w_t320           LIKE LINE OF i_t320,                 "DP1K974368
+      w_vbkd           LIKE s_vbkd.                         "DP1K9A0CVJ
+* End change of D02K916816, (CR211867)
+
+*DATA: i_likp TYPE TABLE OF zsdr075 WITH HEADER LINE,
+*      i_vbup TYPE TABLE OF zsdr075 WITH HEADER LINE,
+*      i_vbep TYPE TABLE OF zsdr075 WITH HEADER LINE,
+*      i_vepo TYPE TABLE OF zsdr075 WITH HEADER LINE,
+*      i_out  TYPE TABLE OF zsdr075 WITH HEADER LINE,
+*      i_zsdr075 TYPE TABLE OF zsdr075 WITH HEADER LINE.
+
+
+** End EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+
+
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*DATA: BEGIN OF i_vekp OCCURS 0,
+*        venum TYPE vekp-venum,
+*        exidv TYPE vekp-exidv,
+*        tarag TYPE vekp-tarag,
+*      END OF i_vekp.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+
+DATA: BEGIN OF i_kna1 OCCURS 0,
+        kunnr TYPE kna1-kunnr,
+        name1 TYPE kna1-name1,
+      END OF i_kna1.
+
+* Begin add of D02K916816, (CR211867)
+TYPES:
+  BEGIN OF t_shipment,
+    tknum      TYPE vttp-tknum,
+    tpnum      TYPE vttp-tpnum,
+    vbeln      TYPE vttp-vbeln,
+    tndr_trkid TYPE vttk-tndr_trkid,
+    tndr_crnm  TYPE vttk-tndr_crnm,
+    route      TYPE vttk-route,
+    vsart      TYPE vttk-vsart,  "D01K952807 on 04/03/09
+    bezei      TYPE tvrot-bezei,
+    vsbezei    TYPE t173t-bezei, "D01K952807 on 04/07/09
+  END OF t_shipment.
+
+TYPES:
+  BEGIN OF t_likp,
+    vbeln TYPE likp-vbeln,
+    kodat TYPE likp-kodat,
+    podat TYPE likp-podat,
+  END OF t_likp.
+
+TYPES:
+  BEGIN OF t_zsde004_05,
+    manifestnum TYPE zsde004_05-manifestnum,
+    vbeln       TYPE zsde004_05-vbeln,
+  END OF t_zsde004_05.
+
+TYPES:
+  BEGIN OF t_line,
+    text(255) TYPE c,
+  END OF t_line.
+
+TYPES:
+  BEGIN OF t_vbep_tmp,
+    vbeln TYPE vbep-vbeln,
+    posnr TYPE vbep-posnr,
+    aufnr TYPE vbep-aufnr,
+  END OF t_vbep_tmp.
+
+TYPES:
+  BEGIN OF t_vttp,
+    tknum TYPE vttp-tknum,
+    tpnum TYPE vttp-tpnum,
+    vbeln TYPE vttp-vbeln,
+  END OF t_vttp.
+
+TYPES:
+  BEGIN OF t_vttk,
+    tknum      TYPE vttk-tknum,
+    route      TYPE vttk-route,
+    vsart      TYPE vttk-vsart, "D01K952807 by G9010248 on 04/03/09
+    tndr_crnm  TYPE vttk-tndr_crnm,
+    tndr_trkid TYPE vttk-tndr_trkid,
+  END OF t_vttk.
+
+TYPES:
+  BEGIN OF t_tvrot,
+    route TYPE tvrot-route,
+    bezei TYPE tvrot-bezei,
+  END OF t_tvrot.
+
+TYPES:
+  BEGIN OF t_text,
+    vbeln TYPE lips-vbeln,
+    lines TYPE string,
+  END OF t_text.
+
+TYPES:
+  BEGIN OF t_valuetab,
+    lines(128) TYPE c,
+  END OF t_valuetab.
+
+*& start - D01K952807 by G9010248 (Eunise) on 04/03/09
+*get vsart description from t173t
+TYPES:
+  BEGIN OF t_t173t,
+    vsart   TYPE t173t-vsart,
+    vsbezei TYPE t173t-bezei,
+  END OF t_t173t.
+*& end - D01K952807
+
+*Start DP1K908448 G9010249 11/02/2009
+*Sales office description
+TYPES:
+  BEGIN OF t_tvkbt,
+    vkbur TYPE tvkbt-vkbur,
+    bezei TYPE tvkbt-bezei,
+  END OF t_tvkbt.
+*End DP1K908448 G9010249 11/02/2009
+
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+TYPES:
+  BEGIN OF t_vbuk,
+    vbeln TYPE vbuk-vbeln,
+    cmgst TYPE vbuk-cmgst,
+  END OF t_vbuk.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+
+DATA:
+  i_deliv       TYPE STANDARD TABLE OF t_likp,
+  i_vbep_tmp    TYPE STANDARD TABLE OF t_vbep_tmp,
+  i_shipment    TYPE STANDARD TABLE OF t_shipment,
+  i_zsde004_05  TYPE STANDARD TABLE OF t_zsde004_05,
+  i_lines       LIKE TABLE OF tline WITH HEADER LINE,
+  i_vttp        TYPE STANDARD TABLE OF t_vttp,
+  i_tvrot       TYPE STANDARD TABLE OF t_tvrot,
+  i_vttk        TYPE STANDARD TABLE OF t_vttk,
+  i_alv_sort    TYPE slis_t_sortinfo_alv,
+  i_text        TYPE STANDARD TABLE OF t_text,
+  i_valuetab    TYPE STANDARD TABLE OF t_valuetab,
+  i_t173t       TYPE STANDARD TABLE OF t_t173t, "D01K952807 on 04/07/2009
+  i_tvkbt       TYPE STANDARD TABLE OF t_tvkbt,   "ADD - DP1K908448
+  i_vbuk        TYPE STANDARD TABLE OF t_vbuk,    "ADD - D01K957290
+  i_tvlst       TYPE STANDARD TABLE OF tvlst,     "ADD - D01K957290
+  i_dd07t_cmgst TYPE TABLE OF dd07t.              "ADD - D01K957290
+
+DATA:
+  w_deliv      LIKE LINE OF i_deliv,
+  w_shipment   LIKE LINE OF i_shipment,
+  w_vbep_tmp   LIKE LINE OF i_vbep_tmp,
+  w_zsde004_05 LIKE LINE OF i_zsde004_05,
+  w_vttp       LIKE LINE OF i_vttp,
+  w_tvrot      LIKE LINE OF i_tvrot,
+  w_vttk       LIKE LINE OF i_vttk,
+  w_alv_sort   TYPE slis_sortinfo_alv,
+  w_text       LIKE LINE OF i_text,
+  w_valuetab   LIKE LINE OF i_valuetab,
+* End add of D02K916816, (CR211867)
+  w_t173t      TYPE t_t173t, "D01K952807 on 04/07/2009
+  w_tvkbt      TYPE t_tvkbt.                      "ADD - DP1K908448
+
+************************************************************************
+*              V A R I A B L E S                                       *
+************************************************************************
+*&&---DEFINE APPLICATION-SPECIFIC DATA VARIABLES HERE------------------
+*BEGIN 07182006 Bambang CR4565 adding to check vstel against
+*authorization
+DATA: gv_auth_fail TYPE c.
+*END
+* Begin add of D02K916816, (CR211867)
+DATA:
+  gv_name(70) TYPE c.
+* End add of D02K916816, (CR211867)
+
+DATA: r_matnr TYPE RANGE OF lips-matnr.               "ADD - DP1K908448
+
+************************************************************************
+*              C O N S T A N T S                                      *
+************************************************************************
+*&&---DEFINE APPLICATION-SPECIFIC CONSTANTS HERE------------------
+* Begin add of D02K916816, (CR211867)
+CONSTANTS:
+  c_10(2)        TYPE c              VALUE '10',
+  c_15(2)        TYPE c              VALUE '15',
+  c_18(2)        TYPE c              VALUE '18',
+  c_25(2)        TYPE c              VALUE '25',
+  c_100(3)       TYPE c              VALUE '100',
+  c_outlen(6)    TYPE c              VALUE '000065',
+  c_vbeln(5)     TYPE c              VALUE 'VBELN',
+  c_etenr(5)     TYPE c              VALUE 'ETENR',
+  c_erdat2(6)    TYPE c              VALUE 'ERDAT2',
+  c_nachn(5)     TYPE c              VALUE 'NACHN',
+  c_kodat(5)     TYPE c              VALUE 'KODAT',
+  c_cert(9)      TYPE c              VALUE 'ZREL_CERT',
+  c_manifest(11) TYPE c              VALUE 'MANIFESTNUM',
+  c_tknum(5)     TYPE c              VALUE 'TKNUM',
+  c_trkid(10)    TYPE c              VALUE 'TNDR_TRKID',
+  c_delv(10)     TYPE c              VALUE 'ZDELV_TEXT',
+  c_id           TYPE thead-tdid     VALUE 'ZDLE',
+  c_object       TYPE thead-tdobject VALUE 'VBBP',
+  c_table(7)     TYPE c              VALUE 'I_OUT[]'.
+* End add of D02K916816, (CR211867)
+
+* Begin add of D02K918904, CR209067 at 06/18/08 (G9008190).
+CONSTANTS:
+  c_zzmpsdate(10)    TYPE c          VALUE 'ZZMPSDATE'.
+* End of D02K918904, CR209067 at 06/18/08 (G9008190).
+
+*Start ADD DP1K908448 G9010249 11/02/2009
+CONSTANTS:
+  c_vkbur(5)       TYPE c          VALUE 'VKBUR',
+  c_vkbur_text(10) TYPE c          VALUE 'VKBUR_TEXT'.
+*End ADD DP1K908448 G9010249 11/02/2009
+************************************************************************
+*              P A R A M E T E R S                                     *
+************************************************************************
+*&&---DEFINE SELECTION SCREEN PARAMETERS HERE------------------
+
+
+
+************************************************************************
+*              S E L E C T   O P T I O N S                             *
+************************************************************************
+*&&---DEFINE SELECT OPTIONS FOR SELECTION SCREEN HERE------------------
+*& start - D01K950731 by G9008586 (W Kamal) on 12/18/08
+* rearrange the selection screen fields.
+*
+*SELECT-OPTIONS: s_vbeln FOR likp-vbeln,
+*                s_lprio FOR likp-lprio,
+*                s_werks FOR lips-werks,
+**BEGIN 07212006 Bambang D01K934598 changed s_vstel as mandatory
+**                s_vstel FOR likp-vstel,
+*                s_vstel FOR likp-vstel OBLIGATORY,
+**END
+*                s_lgort FOR lips-lgort,
+*                s_erdat1 FOR likp-erdat,
+*                s_wbsta FOR vbup-wbsta,
+*                s_kosta FOR vbup-kosta,
+*                s_edatu FOR vbep-edatu,
+*                s_etenr FOR vbep-etenr,
+*                s_erdat2 FOR lips-erdat,
+*                s_wadat FOR likp-wadat_ist,
+*                s_bmeng FOR vbep-bmeng,
+*                s_bstnk FOR vbak-bstnk,
+*                s_ernam FOR lips-ernam,
+*                s_exidv FOR vekp-exidv,
+*                s_prctr FOR lips-prctr,                     "D01K927118
+*** Begin EX88886 (GWR00002-659) - 06 March 2006-D02K900230
+**                s_matnr FOR lips-matnr.                     "D01K927118
+*                s_matnr FOR lips-matnr NO-DISPLAY,
+*                s_mfrpn FOR  mara-mfrpn MATCHCODE OBJECT  mat1_mpn,
+*** End EX88886 (GWR00002-659) - 06 March 2006-D02K900230
+** Begin add of D02K916816, (CR211867)
+*                s_tknum FOR vttk-tknum,
+*                s_track FOR vttk-tndr_trkid.
+** End add of D02K916816, (CR211867)
+
+SELECTION-SCREEN BEGIN OF BLOCK b_org WITH FRAME TITLE TEXT-100.
+SELECT-OPTIONS: s_vkorg FOR likp-vkorg OBLIGATORY,  "Sales Organization
+                s_vtweg FOR lips-vtweg,  "Distribution Channel
+                s_spart FOR lips-spart.  "Divison
+SELECTION-SCREEN END OF BLOCK b_org.
+
+SELECTION-SCREEN BEGIN OF BLOCK b_doc WITH FRAME TITLE TEXT-200.
+SELECT-OPTIONS: s_vbeln FOR likp-vbeln,  "Delivery
+* Make delivery type a required field to use index Z1 - CTD 02/24/11
+*                s_lfart FOR likp-lfart.  "Delivery Type
+                s_lfart FOR likp-lfart OBLIGATORY.  "Delivery Type
+PARAMETERS :    p_zlo  AS CHECKBOX DEFAULT 'X'.
+SELECT-OPTIONS: s_lprio FOR likp-lprio,  "Delivery Priority
+                s_edatu FOR vbep-edatu,  "Delivery Date
+                s_vstel FOR likp-vstel OBLIGATORY,  "Shipping Pt/Rec. Pt
+                s_erdat1 FOR likp-erdat, "Created On (LIKP)
+*                s_erdat2 FOR lips-erdat, "Created On (LIPS)
+                s_ernam FOR lips-ernam.  "Created by
+
+SELECT-OPTIONS: s_kunag FOR likp-kunag,  "Sold-To Party
+                s_kunnr FOR likp-kunnr,  "Ship-To Party
+* Add Freight Terms to selection screen - CTD 02/24/11
+                s_sdabw FOR likp-sdabw.  "Freight Terms
+
+* Make goods mvmt date a required field to use index Z1 - CTD 02/24/11
+*SELECT-OPTIONS: s_wadat FOR likp-wadat_ist,  "Act Goods Mvmt Date
+SELECT-OPTIONS: s_wadat FOR likp-wadat_ist OBLIGATORY,  "Act Goods Mvmt Date
+                s_wbsta FOR vbup-wbsta OBLIGATORY, "Goods movement status
+                s_kosta FOR vbup-kosta,  "Picking status/Putaway status
+                s_bmeng FOR vbep-bmeng,  "Confirmed Quantity
+                s_bstnk FOR vbak-bstnk,  "Customer purchase order number
+                s_posex FOR vbap-posex,  "Customer PO Item  - D01K951567
+                s_bstkd FOR vbkd-bstkd,  "Customer PO - Item Lvl, D01K951830
+*                s_exidv FOR vekp-exidv,  "External Handling Unit Identification "D01K957024
+                s_prctr FOR lips-prctr,  "Profit Center
+                s_matnr FOR lips-matnr,  "Material
+                s_werks FOR lips-werks,  "Plant
+                s_lgort FOR lips-lgort,  "Storage Location
+                s_mvgr4 FOR mvke-mvgr4,  "Material Group 4
+                s_tknum FOR vttk-tknum,  "Shipment Number
+                s_track FOR vttk-tndr_trkid.  "Forwarding Agent Tracking ID
+
+SELECT-OPTIONS: s_etenr FOR vbep-etenr,  "Delivery Schedule Line Number
+                s_mfrpn FOR mara-mfrpn MATCHCODE OBJECT  mat1_mpn.  "Manuf. Part #
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+PARAMETERS :    p_delblk  AS CHECKBOX DEFAULT space.  "DO NOT include delivery blocks
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+SELECTION-SCREEN END OF BLOCK b_doc.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/18/08
+
+
+************************************************************************
+*              I N I T I A L I Z A T I O N                             *
+************************************************************************
+INITIALIZATION.
+
+
+************************************************************************
+*              A T   S E L E C T I O  N   S C R E E N                  *
+************************************************************************
+AT SELECTION-SCREEN.
+PERFORM auth_check_selopt_vkorg TABLES s_vkorg[].                                                "$smart: #826
+
+
+AT SELECTION-SCREEN OUTPUT.
+
+************************************************************************
+*                  T O P - O F - P A G E  E V E N T                    *
+************************************************************************
+TOP-OF-PAGE.
+
+
+************************************************************************
+*                  E N D - O F - P A G E  E V E N T                    *
+************************************************************************
+END-OF-PAGE.
+
+
+************************************************************************
+*              S T A R T   O F   S E L E C T I O N                     *
+************************************************************************
+START-OF-SELECTION.
+*BEGIN 07182006 Bambang CR4565 adding to check vstel against
+*authorization
+  CLEAR: gv_auth_fail.
+  PERFORM f_vstel_auth_check USING gv_auth_fail.
+  IF NOT gv_auth_fail IS INITIAL.
+    EXIT.
+  ENDIF.
+**END
+
+* Append a record to s_wadat to find blank value goods movement dates
+* for certain delivery types.  CTD 02/24/11
+* Do this for all delivery types - CTD 03/15/11
+*  IF 'NL'   IN s_lfart
+*  OR 'NLCC' IN s_lfart
+*  OR 'ZLO'  IN s_lfart.
+  s_wadat-sign   = 'I'.
+  s_wadat-option = 'EQ'.
+  s_wadat-low    = '00000000'.
+  s_wadat-high   = '00000000'.
+  APPEND s_wadat.
+*  ENDIF.
+
+*Start MOD DP1K908448 G9010249 11/02/2009
+* Make a copy of s_matnr first before passing to insmatnr routine
+  r_matnr[] = s_matnr[].
+** Begin EX88886 (GWR00002-659) - 06 March 2006-D02K900230
+  PERFORM insmatnr(zfir021) TABLES s_matnr s_mfrpn.
+** End EX88886 (GWR00002-659) - 06 March 2006-D02K900230
+
+* Add the material numbers entered by user back to s_matnr so that it can
+* be used to filter in get_data routine select statement below
+  IF s_matnr[] IS INITIAL.
+    s_matnr[] = r_matnr[].
+  ELSE.
+    APPEND LINES OF r_matnr TO s_matnr.
+  ENDIF.
+*End MOD DP1K908448 G9010249 11/02/2009
+  PERFORM get_data.
+  PERFORM merge.
+
+************************************************************************
+*              E N D   O F   S E L E C T I O N                         *
+************************************************************************
+END-OF-SELECTION.
+  PERFORM display_data.
+
+************************************************************************
+*             S U B R O U T I N E S                                    *
+***********************************************************************
+*&---------------------------------------------------------------------*
+*&      Form  get_data
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_data .
+
+  PERFORM display_status USING 'Selecting Sales data' 0.
+
+*PLEASE DO NOT CHANGE THIS SELECT STATEMENT, WE FOUND THIS TO BE FASTER
+*THAN SEVERAL SMALLER SELECTS
+
+*{    DELETE    Issue No. - 6366  07/16/2007    EX88845
+*  SELECT likp~vbeln likp~lprio lips~werks likp~vstel
+*         lips~lgort likp~erdat AS erdat1 lips~erdat AS erdat2
+*         likp~wadat_ist AS wadat lips~matnr lips~lgpbe
+*         lips~ernam lips~lfimg likp~lfart lips~posnr
+*         lips~vgbel lips~vgpos likp~kunnr
+*         vbup~wbsta vbup~kosta
+*         vbep~edatu vbep~etenr
+*         vbep~bmeng vbak~bstnk vbep~vbeln AS vbeln_va
+*         vbep~posnr AS posnr_va
+**         vepo~vbeln vepo~venum
+*         lips~prctr lips~matnr                              "D01K927118
+*    INTO CORRESPONDING FIELDS OF TABLE i_zsdr075
+*FROM ( likp INNER JOIN lips ON lips~vbeln = likp~vbeln
+*            INNER JOIN vbup ON vbup~posnr = lips~posnr AND
+*                               vbup~vbeln = lips~vbeln
+*            INNER JOIN vbep ON vbep~vbeln = lips~vgbel AND
+*                               vbep~posnr = lips~vgpos
+*            INNER JOIN vbak ON vbak~vbeln = lips~vgbel )
+**           LEFT OUTER JOIN vepo ON lips~vbeln = vepo~vbeln AND
+**                                   lips~posnr = vepo~posnr )
+*}    DELETE    Issue No. - 6366  07/16/2007    EX88845
+
+  DATA: li_zsdr075_temp LIKE STANDARD TABLE OF i_zsdr075."ADD - DP1K908448
+
+*{    INSERT    Issue No. - 6366  07/16/2007    EX88845
+  SELECT likp~vbeln likp~lprio lips~werks likp~vstel
+         likp~lfart likp~kunag                              "D01K950731
+         likp~kunnr AS kunwe          "D01K950731 - NOT REQUIRED??
+         likp~vkorg likp~wadat AS wadat_p                   "D01K950731
+         likp~lifsk                                         "D01K957290
+         likp~inco1 likp~inco2                              " Add D01K959893
+* Add Freight Terms to data selection - CTD 02/24/11
+         likp~sdabw
+*        lips~lgort likp~erdat AS erdat1 likp~erdat AS erdat2  " cmt - D01K955374
+         likp~erzet                                         "DP1K973763
+         lips~lgort likp~erdat AS erdat1 vbak~erdat AS erdat2  " add - D01K955374
+         likp~wadat_ist AS wadat lips~matnr lips~lgpbe
+         lips~ernam lips~lfimg likp~lfart
+         lips~posnr                                     "CHG-D01K950731
+         lips~pstyv                                         "D01K950731
+         lips~vgbel lips~vgpos likp~kunnr
+         lips~arktx lips~matwa lips~vrkme                   "D01K950731
+         lips~vtweg lips~spart lips~mbdat             "DP1K911229"D01K950731
+         vbup~wbsta vbup~kosta
+*        vbep~edatu vbep~etenr                              "D02K912777
+*        vbep~bmeng vbak~bstnk vbep~vbeln AS vbeln_va       "D02K912777
+*        vbep~bmeng                                         "D02K912777
+         vbak~bstnk vbap~vbeln AS vbeln_va                  "D02K912777
+*        vbep~posnr AS posnr_va                             "D02K912777
+         vbap~posnr AS posnr_va                             "D02K912777
+         vbap~posex vbap~kzwi1 vbap~zzaircraft              "D01K950731
+*         vepo~vbeln vepo~venum
+         lips~prctr lips~matnr                              "D01K927118
+*         vbap~netwr AS netwr_ap                            "D02K912272
+         vbap~netpr  AS netwr_ap                            "D02K912272
+         vbap~shkzg AS shkzg_va
+         vbak~waerk
+         lips~charg
+* Begin add of D02K918904, CR209067 at 06/18/08 (G9008190).
+         vbap~zzmpsdate
+* End add of D02K918904, CR209067 at 06/18/08 (G9008190).
+*Begin of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+         vbap~kzwi3
+         vbap~kwmeng
+*End of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+         vbak~vkbur                                   "ADD - DP1K908448
+         vbak~kvgr1                                   "ADD - DP1K952418 J.Garcia
+         vbak~kvgr3                                   "ADD - D01K963580
+         vbap~vkaus                                   "+DP1K928312
+         vbap~audat                                         "DP1K930895
+         likp~aedat                                         "DP1K971205
+
+*& Begin Change - D01K9A0BRO
+         lips~zzaircraft AS zzaircraft_lips
+         lips~z_cus_ondock_date
+         lips~z_cus_ship_date
+         lips~z_pr_ondock_date
+*& End Change - D01K9A0BRO
+
+    INTO CORRESPONDING FIELDS OF TABLE i_zsdr075
+FROM ( likp INNER JOIN lips ON lips~vbeln = likp~vbeln
+            INNER JOIN vbup ON vbup~posnr = lips~posnr AND
+                               vbup~vbeln = lips~vbeln
+*            INNER JOIN vbep ON vbep~vbeln = lips~vgbel AND "D02K912777
+*                               vbep~posnr = lips~vgpos     "D02K912777
+            INNER JOIN vbak ON vbak~vbeln = lips~vgbel
+            INNER JOIN vbap ON vbap~vbeln = lips~vgbel AND
+                               vbap~posnr = lips~vgpos )
+*}    INSERT    Issue No. - 6366  07/16/2007    EX88845
+   WHERE likp~vbeln IN s_vbeln
+     AND likp~lprio IN s_lprio
+     AND lips~werks IN s_werks
+     AND likp~vkorg IN s_vkorg                              "D01K950731
+     AND likp~vstel IN s_vstel
+     AND likp~lfart IN s_lfart                              "D01K950731
+     AND likp~kunag IN s_kunag                              "D01K950731
+     AND likp~kunnr IN s_kunnr                              "D01K950731
+* Add Freight Terms to data selection - CTD 02/24/11
+     AND likp~sdabw IN s_sdabw
+     AND lips~vtweg IN s_vtweg                              "D01K950731
+     AND lips~spart IN s_spart                              "D01K950731
+     AND lips~lgort IN s_lgort
+     AND likp~erdat IN s_erdat1
+     AND vbup~wbsta IN s_wbsta
+     AND vbup~kosta IN s_kosta
+*    AND vbep~edatu IN s_edatu                              "D02K912777
+*    AND vbep~etenr IN s_etenr                              "D02K912777
+*     AND lips~erdat IN s_erdat2                            "cmt-D01K950731
+     AND likp~wadat_ist IN s_wadat
+*    AND vbep~bmeng IN s_bmeng                              "D02K912777
+     AND vbak~bstnk IN s_bstnk
+     AND vbap~posex IN s_posex                              "D01K951567
+     AND lips~ernam IN s_ernam
+     AND lips~prctr IN s_prctr                              "D01K927118
+     AND lips~matnr IN s_matnr.                             "D01K927118
+* Begin insert by Jai Ko : DP1K910186
+  IF p_zlo IS NOT INITIAL.
+    SELECT likp~vbeln likp~lprio lips~werks likp~vstel
+        likp~lfart likp~kunag
+        likp~kunnr AS kunwe
+        likp~vkorg likp~wadat AS wadat_p
+        likp~lifsk                                          "D01K957290
+        likp~erzet                                          "DP1K973763
+        lips~lgort likp~erdat AS erdat1
+        likp~wadat_ist AS wadat lips~matnr lips~lgpbe
+* Add Freight Terms to data selection - CTD 02/24/11
+        likp~sdabw
+        lips~ernam lips~lfimg likp~lfart likp~waerk
+        lips~posnr
+        lips~pstyv
+        lips~vgbel lips~vgpos likp~kunnr
+        lips~arktx lips~matwa lips~vrkme
+        lips~vtweg lips~spart
+        vbup~wbsta vbup~kosta
+        lips~prctr lips~matnr
+        lips~charg
+        likp~aedat                                          "DP1K971205
+
+*& Begin Change - D01K9A0BRO
+         lips~zzaircraft AS zzaircraft_lips
+         lips~z_cus_ondock_date
+         lips~z_cus_ship_date
+         lips~z_pr_ondock_date
+*& End Change - D01K9A0BRO
+
+     APPENDING CORRESPONDING FIELDS OF TABLE i_zsdr075
+     FROM ( likp INNER JOIN lips ON lips~vbeln = likp~vbeln
+                 INNER JOIN vbup ON vbup~posnr = lips~posnr AND
+                                    vbup~vbeln = lips~vbeln )
+    WHERE likp~vbeln IN s_vbeln
+      AND likp~lprio IN s_lprio
+      AND lips~werks IN s_werks
+      AND likp~vkorg IN s_vkorg
+      AND likp~vstel IN s_vstel
+      AND likp~lfart = 'ZLO'
+      AND likp~kunag IN s_kunag
+      AND likp~kunnr IN s_kunnr
+* Add Freight Terms to data selection - CTD 02/24/11
+      AND likp~sdabw IN s_sdabw
+      AND lips~vtweg IN s_vtweg
+      AND lips~spart IN s_spart
+      AND lips~lgort IN s_lgort
+      AND likp~erdat IN s_erdat1
+      AND vbup~wbsta IN s_wbsta
+      AND vbup~kosta IN s_kosta
+      AND likp~wadat_ist IN s_wadat
+      AND lips~ernam IN s_ernam
+      AND lips~prctr IN s_prctr
+      AND lips~matnr IN s_matnr.
+  ENDIF.
+* End insert by Jai Ko :  DP1K910186
+* Begin insert by Jai Ko : D02K912777
+
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+* Delete records with delivery block
+  IF p_delblk = c_x.
+    DELETE i_zsdr075 WHERE lifsk NE space.
+  ENDIF.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+
+  CHECK NOT i_zsdr075[] IS INITIAL.                         "D02K914217
+
+*Start ADD DP1K908448 G9010249 11/02/2009
+* Retrieve sales office description
+  li_zsdr075_temp[] = i_zsdr075[].
+  SORT li_zsdr075_temp BY vkbur.
+  DELETE ADJACENT DUPLICATES FROM li_zsdr075_temp COMPARING vkbur.
+
+* Access using primary keys
+  SELECT vkbur bezei
+    INTO TABLE i_tvkbt
+    FROM tvkbt
+     FOR ALL ENTRIES IN li_zsdr075_temp
+   WHERE spras = sy-langu
+     AND vkbur = li_zsdr075_temp-vkbur.
+
+  IF sy-subrc = 0.
+    SORT i_tvkbt BY vkbur.
+  ENDIF.
+*End ADD DP1K908448 G9010249 11/02/2009
+
+* Begin of Insertion - DP1K928312
+  li_zsdr075_temp[] = i_zsdr075[].
+  SORT li_zsdr075_temp
+    BY vkaus.
+  DELETE ADJACENT DUPLICATES FROM li_zsdr075_temp
+    COMPARING vkaus.
+* Access using full primary key
+  SELECT *
+    FROM tvlvt
+    INTO TABLE i_tvlvt
+    FOR ALL ENTRIES IN li_zsdr075_temp
+    WHERE spras EQ sy-langu
+    AND   abrvw EQ li_zsdr075_temp-vkaus.
+  IF sy-subrc EQ 0.
+    SORT i_tvlvt BY abrvw.
+  ENDIF.
+* End of Insertion - DP1K928312
+
+  SELECT vbeln posnr vgbel vgpos vtweg aufnr uecha      "D02K916816-CHG
+    FROM lips INTO TABLE xlips
+  FOR ALL ENTRIES IN i_zsdr075
+  WHERE vbeln = i_zsdr075-vbeln
+    AND posnr = i_zsdr075-posnr.
+* Begin add of D02K916816, (CR211867)
+  IF sy-subrc EQ 0.
+    SORT xlips BY vbeln posnr.
+    DELETE ADJACENT DUPLICATES FROM xlips
+      COMPARING vbeln posnr.
+  ENDIF.
+
+  IF xlips IS NOT INITIAL.
+* Retrieve truck manifest no, delivery
+* from ZSDE004_05
+* using partial primary key: VBELN
+    SELECT manifestnum vbeln
+      FROM zsde004_05
+      INTO TABLE i_zsde004_05
+       FOR ALL ENTRIES IN xlips
+     WHERE vbeln = xlips-vbeln.
+    IF sy-subrc EQ 0.
+      SORT i_zsde004_05 BY vbeln manifestnum.
+      DELETE ADJACENT DUPLICATES FROM i_zsde004_05
+        COMPARING vbeln manifestnum.
+    ENDIF.
+  ENDIF.
+* End add of D02K916816, (CR211867)
+
+  SORT xlips BY vbeln posnr.                                "D02K914736
+
+*& Begin Change - DP1K969749
+  SELECT vbelv posnv vbtyp_n erdat erzet
+    FROM vbfa INTO TABLE i_vbfa
+  FOR ALL ENTRIES IN i_zsdr075
+  WHERE vbelv = i_zsdr075-vbeln
+    AND posnv = i_zsdr075-posnr
+    AND ( ( vbtyp_n = 'Q' )
+*    AND NOT taqui = space )
+     OR ( vbtyp_n = 'R'
+    AND NOT bwart = space ) ).
+
+  IF sy-subrc EQ 0.
+    SORT i_vbfa BY vbelv posnv vbtyp_n erdat DESCENDING erzet DESCENDING.
+    DELETE ADJACENT DUPLICATES FROM i_vbfa
+      COMPARING vbelv posnv vbtyp_n.
+  ENDIF.
+*& End Change - DP1K969749
+
+*& Begin Change - DP1K971972.
+*  SELECT vbeln posnr country
+  SELECT vbeln country
+    INTO TABLE i_shipto_country
+    FROM vbpa
+      INNER JOIN adrc ON adrc~addrnumber = vbpa~adrnr
+    FOR ALL ENTRIES IN i_zsdr075
+    WHERE vbeln = i_zsdr075-vbeln
+*      AND posnr = i_zsdr075-posnr
+      AND parvw = 'WE'.
+
+  IF sy-subrc EQ 0.
+    SORT i_shipto_country BY vbeln country.
+    DELETE ADJACENT DUPLICATES FROM i_shipto_country
+      COMPARING vbeln country.
+  ENDIF.
+*& End Change - DP1K971972
+
+*& Begin Change - DP1K974368
+  li_zsdr075_temp[] = i_zsdr075[].
+  SORT li_zsdr075_temp BY werks lgort.
+  DELETE ADJACENT DUPLICATES FROM li_zsdr075_temp
+    COMPARING werks lgort.
+
+  SELECT werks lgort lgnum
+    FROM t320
+    INTO CORRESPONDING FIELDS OF TABLE i_t320
+    FOR ALL ENTRIES IN li_zsdr075_temp
+    WHERE werks = li_zsdr075_temp-werks
+      AND lgort = li_zsdr075_temp-lgort.
+
+  SORT i_t320 BY werks lgort lgnum.
+  DELETE ADJACENT DUPLICATES FROM i_t320
+    COMPARING werks lgort.
+
+  IF i_t320 IS NOT INITIAL.
+    LOOP AT i_zsdr075.
+      READ TABLE i_t320 INTO w_t320 WITH KEY werks = i_zsdr075-werks
+                                             lgort = i_zsdr075-lgort.
+      IF  sy-subrc = 0.
+        i_zsdr075-lgnum = w_t320-lgnum.
+        MODIFY i_zsdr075.
+      ENDIF.
+    ENDLOOP.
+
+    li_zsdr075_temp[] = i_zsdr075[].
+    SORT li_zsdr075_temp BY lgnum lgort vbeln.
+    DELETE ADJACENT DUPLICATES FROM li_zsdr075_temp
+      COMPARING lgnum lgort vbeln.
+    DELETE li_zsdr075_temp WHERE lgnum IS INITIAL OR
+                                 lgort IS INITIAL OR
+                                 vbeln IS INITIAL.
+*  & End Change - DP1K974368
+
+*  & Begin Change - DP1K973763
+    SELECT vbeln tanum
+      INTO TABLE i_ltap
+      FROM ltap
+      FOR ALL ENTRIES IN li_zsdr075_temp                    "DP1K974368
+      WHERE lgnum = li_zsdr075_temp-lgnum                   "DP1K974368
+        AND lgort = li_zsdr075_temp-lgort                   "DP1K974368
+        AND vbeln = li_zsdr075_temp-vbeln.                  "DP1K974368
+
+    IF sy-subrc EQ 0.
+      SORT i_ltap BY vbeln tanum DESCENDING.
+      DELETE ADJACENT DUPLICATES FROM i_ltap
+        COMPARING vbeln.
+    ENDIF.
+  ENDIF.                                                    "DP1K974565
+*& End Change - DP1K973763
+
+  LOOP AT i_zsdr075.
+    READ TABLE xlips INTO vlips WITH KEY vbeln = i_zsdr075-vbeln
+                                         posnr = i_zsdr075-posnr
+                                         BINARY SEARCH      "D02K914736
+                                   TRANSPORTING uecha. "D02K916816-ADD
+    CHECK vlips-uecha IS INITIAL.
+    APPEND i_zsdr075 TO tmp_summary.
+    DELETE i_zsdr075.
+  ENDLOOP.
+** Sum the Sub Items
+
+  LOOP AT i_zsdr075.
+    READ TABLE xlips INTO vlips  WITH KEY vbeln = i_zsdr075-vbeln
+                                          posnr = i_zsdr075-posnr
+                                   BINARY SEARCH       "D02K916816-ADD
+                                   TRANSPORTING uecha. "D02K916816-ADD
+
+*    READ TABLE tmp_summary WITH KEY vbeln = i_zsdr075-vbeln
+*                                    posnr = vlips-uecha.
+    LOOP AT tmp_summary WHERE vbeln = i_zsdr075-vbeln
+                          AND posnr = vlips-uecha.
+      IF sy-subrc = 0.
+*& start - D01K952807 by G9010248 (Eunise) on 03/20/09
+*get pick status from batch item
+        tmp_summary-kosta = i_zsdr075-kosta.
+*& end - D01K952807 by G9010248 (Eunise) on 03/20/09
+        COMPUTE tmp_summary-lfimg = tmp_summary-lfimg + i_zsdr075-lfimg.
+        MODIFY tmp_summary TRANSPORTING lfimg kosta.        "D01K952807
+      ENDIF.
+    ENDLOOP.
+    DELETE i_zsdr075.
+  ENDLOOP.
+
+** just incase incase sometimes is miss out
+  CLEAR i_zsdr075.
+  LOOP AT tmp_summary.
+    APPEND tmp_summary TO i_zsdr075.
+    CLEAR i_zsdr075.
+  ENDLOOP.
+  SORT i_zsdr075 BY erdat1 vbeln.
+
+  IF NOT i_zsdr075[] IS INITIAL.                      "ADD - DP1K908649
+    SELECT vbeln posnr etenr edatu bmeng
+      INTO CORRESPONDING FIELDS OF TABLE i_vbep
+      FROM vbep
+      FOR ALL ENTRIES IN i_zsdr075
+    WHERE vbeln = i_zsdr075-vbeln_va
+      AND posnr = i_zsdr075-posnr_va
+      AND etenr IN s_etenr
+      AND edatu IN s_edatu.
+* Begin insert by Jai Ko : DP1K908978
+    SELECT kunnr vkorg vtweg spart inco1 inco2
+      INTO CORRESPONDING FIELDS OF TABLE i_knvv
+      FROM knvv
+      FOR ALL ENTRIES IN i_zsdr075
+    WHERE kunnr = i_zsdr075-kunnr
+      AND vkorg = i_zsdr075-vkorg
+      AND vtweg = i_zsdr075-vtweg
+      AND spart = i_zsdr075-spart.
+* End insert by Jai Ko : DP1K908978
+    SORT i_vbep BY vbeln posnr etenr.
+
+    LOOP AT i_zsdr075.
+      READ TABLE i_vbep WITH KEY vbeln = i_zsdr075-vbeln_va
+                                 posnr = i_zsdr075-posnr_va
+                                 BINARY SEARCH
+                        TRANSPORTING edatu bmeng etenr.  "D02K916816-ADD
+      IF sy-subrc = 0.
+        i_zsdr075-edatu = i_vbep-edatu.
+        i_zsdr075-bmeng = i_vbep-bmeng.
+        i_zsdr075-etenr = i_vbep-etenr.
+        MODIFY i_zsdr075.
+        CLEAR i_zsdr075.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.                                              "ADD - DP1K908649
+* End insert by Jai Ko : D02K912777
+
+* Begin insert by Jai Ko : D02K914179
+  IF s_edatu IS NOT INITIAL.
+* Begin add/chg of D02K916816, (CR211867)
+    DELETE i_zsdr075[] WHERE edatu NOT IN s_edatu.
+*     LOOP AT i_zsdr075.
+*       IF i_zsdr075-edatu NOT IN s_edatu.
+*          DELETE i_zsdr075.
+*       ENDIF.
+*     ENDLOOP.
+* End add/chg of D02K916816, (CR211867)
+  ENDIF.
+* End insert by Jai Ko : D02K914179
+
+* REMOVE INVALID BATCH RECORDS & Move the Qty
+*  LOOP AT i_zsdr075 WHERE charg <> space.                  "D02K912777
+*    MOVE i_zsdr075-bmeng TO i_zsdr075-lfimg.               "D02K912777
+*    MODIFY i_zsdr075.                                      "D02K912777
+*  ENDLOOP.                                                 "D02K912777
+*  DELETE i_zsdr075 WHERE lfimg = 0.                        "D02K912777
+
+*  PERFORM display_status USING 'GET SALES DOCUMENT DATA' 0.
+** GET SALES DOCUMENT DATA / DRIVER FOR PROGRAM
+*  SELECT likp~vbeln likp~lprio lips~werks likp~vstel
+*         lips~lgort likp~erdat AS erdat1 lips~erdat AS erdat2
+*         likp~wadat_ist AS wadat lips~matnr lips~lgpbe
+*         lips~ernam lips~lfimg likp~lfart lips~posnr
+*         lips~vgbel lips~vgpos likp~kunnr
+*    INTO CORRESPONDING FIELDS OF TABLE i_likp
+*    FROM ( likp INNER JOIN lips ON likp~vbeln = lips~vbeln )
+*   WHERE likp~vbeln IN s_vbeln
+*     AND likp~lprio IN s_lprio
+*     AND lips~werks IN s_werks
+*     AND likp~vstel IN s_vstel
+*     AND lips~lgort IN s_lgort
+*     AND likp~erdat IN s_erdat1
+*     AND lips~erdat IN s_erdat2
+*     AND likp~wadat_ist IN s_wadat
+*     AND lips~ernam IN s_ernam.
+*
+*  PERFORM display_status USING 'GET SALES DOC SCHEDULE LINE DATA' 0.
+** GET SALES DOCUMENT SCHEDULE LINE DATA
+*  SELECT vbep~vbeln vbep~posnr
+*         vbep~edatu vbep~etenr vbep~bmeng vbak~bstnk
+*         vbep~vbeln AS vbeln_va vbep~posnr AS posnr_va
+*    INTO CORRESPONDING FIELDS OF TABLE i_vbep
+*   FROM ( vbak INNER JOIN vbep ON vbep~vbeln = vbak~vbeln )
+*   FOR ALL entries IN i_likp
+*   WHERE vbep~vbeln = i_likp-vgbel
+*     AND vbep~posnr = i_likp-vgpos
+*     AND vbep~edatu IN s_edatu
+*     AND vbep~etenr IN s_etenr
+*     AND vbep~bmeng IN s_bmeng
+*     AND vbak~bstnk IN s_bstnk.
+*
+*  PERFORM display_status USING 'GET SALES DOCUMENT ITEM STATUS' 0.
+*
+**GET SALES DOCUMENT ITEM STATUS
+*  SELECT vbup~vbeln vbup~wbsta vbup~kosta vbup~posnr
+*    INTO CORRESPONDING FIELDS OF TABLE i_vbup
+*    FROM vbup
+*   FOR ALL ENTRIES IN i_likp
+*   WHERE vbup~vbeln = i_likp-vbeln
+*     AND vbup~posnr = i_likp-posnr
+*     AND vbup~wbsta IN s_wbsta
+*     AND vbup~kosta IN s_kosta.
+
+*  PERFORM display_status USING 'GET HANDLING UNIT ITEM' 0. "-D01K957024
+
+** GET HANDLING UNIT ITEM
+*  DATA: tmp_003 TYPE TABLE OF zsdr075.   "cmt-D01K950731
+* Begin of change - D01K963580 - change to new structure
+*  DATA: tmp_003 LIKE TABLE OF s_zsdr075.  "ins-D01K950731
+  DATA: tmp_003 TYPE TABLE OF t_zsdr075.
+* End of change - D01K963580
+
+* Begin add of D02K916816, (CR211867)
+  CHECK i_zsdr075[] IS NOT INITIAL.
+* End add of D02K916816, (CR211867)
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*  tmp_003[] = i_zsdr075[].
+*
+*  SORT tmp_003 BY matnr werks.
+*  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING  matnr werks.
+*
+*  SELECT vepo~vbeln vepo~posnr vepo~venum
+*         vepo~vepos                       "ins-D01K950731
+*    INTO CORRESPONDING FIELDS OF TABLE i_vepo
+*    FROM vepo
+*   FOR ALL ENTRIES IN tmp_003
+*   WHERE matnr = tmp_003-matnr
+*     AND werks = tmp_003-werks.
+**     AND vepo~vbeln = i_zsdr075-vbeln
+**     AND vepo~posnr = i_zsdr075-posnr.
+*
+*  SORT i_vepo BY vbeln posnr.              "ins-D01K950731
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+
+* Begin add/chg of D02K916816, (CR211867)
+  CLEAR: tmp_003.
+  REFRESH: tmp_003.
+*  CHECK i_zsdr075[] IS NOT INITIAL.
+
+*  DATA: tmp_001 TYPE TABLE OF zsdr075.
+
+*  tmp_001[] = i_likp[].
+  tmp_003[] = i_zsdr075[].
+
+  SORT tmp_003 BY kunnr.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING kunnr.
+* End add/chg of D02K916816, (CR211867)
+
+  PERFORM display_status USING 'Selecting Customer Names' 0.
+
+  IF tmp_003[] IS NOT INITIAL.              "D02K916816-CHG
+* GET CUSTOMER NAME FROM CUSTOMER MASTER
+    SELECT kunnr name1
+      INTO CORRESPONDING FIELDS OF TABLE i_kna1
+      FROM kna1
+     FOR ALL ENTRIES IN tmp_003            "D02K916816-CHG
+     WHERE kunnr = tmp_003-kunnr.          "D02K916816-CHG
+  ENDIF.
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/29/08
+* do another round for KUNAG
+  tmp_003[] = i_zsdr075[].
+
+  SORT tmp_003 BY kunag.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING kunag.
+
+  PERFORM display_status USING 'Selecting Customer Names (KUNAG)' 0.
+
+  IF tmp_003[] IS NOT INITIAL.
+* GET CUSTOMER NAME FROM CUSTOMER MASTER
+    SELECT kunnr name1
+      APPENDING CORRESPONDING FIELDS OF TABLE i_kna1
+      FROM kna1
+     FOR ALL ENTRIES IN tmp_003
+     WHERE kunnr = tmp_003-kunag.
+
+    SORT i_kna1 BY kunnr.
+    DELETE ADJACENT DUPLICATES FROM i_kna1 COMPARING kunnr.
+  ENDIF.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/29/08
+
+*  PERFORM display_status USING 'Retrieving Handling Units' 0. "-D01K957024
+* Begin add/chg of D02K916816, (CR211867)
+*  DATA: tmp_002 TYPE TABLE OF zsdr075.
+  CLEAR: tmp_003.
+  REFRESH: tmp_003.
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*  tmp_003[] = i_vepo[].
+*
+*  SORT tmp_003 BY venum.
+*  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING venum.
+*
+*  IF tmp_003[] IS NOT INITIAL.
+* End add/chg of D02K916816, (CR211867)
+* GET HANDLING UNIT - HEADER TABLE
+*    SELECT venum exidv tarag
+*        INTO CORRESPONDING FIELDS OF TABLE i_vekp
+*        FROM vekp
+**      FOR ALL ENTRIES IN i_vepo
+*        FOR ALL ENTRIES IN tmp_003         "D02K916816-CHG
+*       WHERE venum = tmp_003-venum         "D02K916816-CHG
+*         AND exidv IN s_exidv.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*  ENDIF.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+
+  SORT i_zsdr075 BY erdat1 vbeln.
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*  SORT i_vekp BY venum.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*  SORT i_vbup BY vbeln posnr.
+*  SORT i_vbep BY vbeln posnr.
+*  SORT i_likp BY vgbel vgpos.
+*  SORT i_vepo BY vbeln posnr.              "-D01K957024
+  SORT i_kna1 BY kunnr.
+
+* Begin add of D02K916816, (CR211867)
+  IF i_zsdr075[] IS NOT INITIAL.
+* Retrieve sales doc, item, order num
+* from VBEP
+* using partial primary key: VBELN POSNR
+    SELECT vbeln posnr aufnr
+      INTO TABLE i_vbep_tmp
+      FROM vbep
+       FOR ALL ENTRIES IN i_zsdr075
+     WHERE vbeln = i_zsdr075-vgbel
+*       AND posnr = i_zsdr075-posnr.    "cmt-D01K950731
+       AND posnr = i_zsdr075-vgpos.     "ins-D01K950731
+    IF sy-subrc EQ 0.
+      SORT i_vbep_tmp BY vbeln posnr.
+      DELETE ADJACENT DUPLICATES FROM i_vbep_tmp
+        COMPARING vbeln posnr.
+    ENDIF.
+
+* Retrieve delivery, picking date, POD
+* from LIKP
+* using full primary key: VBELN
+    SELECT vbeln kodat podat
+      INTO TABLE i_deliv
+      FROM likp
+       FOR ALL ENTRIES IN i_zsdr075
+     WHERE vbeln  = i_zsdr075-vbeln.
+    IF sy-subrc EQ 0.
+      SORT i_deliv BY vbeln.
+      DELETE ADJACENT DUPLICATES FROM i_deliv
+        COMPARING vbeln.
+    ENDIF.
+  ENDIF.
+
+  IF i_deliv IS NOT INITIAL.
+* Retrieve shipment number, item, delivery
+* from VTTP
+* using partial primary key: TKNUM VBELN
+    SELECT tknum tpnum vbeln
+      FROM vttp
+      INTO TABLE i_vttp
+       FOR ALL ENTRIES IN i_deliv
+     WHERE tknum IN s_tknum
+       AND vbeln = i_deliv-vbeln.
+  ENDIF.
+
+  IF i_vttp[] IS NOT INITIAL.
+* Retrieve shipment number, route, carrier name, forwarding agent
+* from VTTK
+* using full primary key: TKNUM
+    SELECT tknum route vsart tndr_crnm tndr_trkid "D01K952807 on 04/03/09 - add vsart
+      FROM vttk
+      INTO TABLE i_vttk
+       FOR ALL ENTRIES IN i_vttp
+     WHERE tknum = i_vttp-tknum
+       AND tndr_trkid IN s_track.
+    IF sy-subrc EQ 0.
+      SORT i_vttk BY tknum.
+      DELETE ADJACENT DUPLICATES FROM i_vttk
+        COMPARING tknum.
+    ENDIF.
+  ENDIF.
+
+  LOOP AT i_vttp INTO w_vttp.
+* Get shipment number, route, carrier name, forwarding agent from
+* internal table
+    READ TABLE i_vttk INTO w_vttk
+         WITH KEY tknum = w_vttp-tknum
+         BINARY SEARCH
+         TRANSPORTING tndr_trkid tndr_crnm route vsart. "D01K952807 on 04/03/09
+    IF sy-subrc EQ 0.
+      w_shipment-tknum      = w_vttp-tknum.
+      w_shipment-tpnum      = w_vttp-tpnum.
+      w_shipment-vbeln      = w_vttp-vbeln.
+      w_shipment-tndr_trkid = w_vttk-tndr_trkid.
+      w_shipment-tndr_crnm  = w_vttk-tndr_crnm.
+      w_shipment-route      = w_vttk-route.
+      w_shipment-vsart      = w_vttk-vsart. "D01K952807 on 04/03/09
+      APPEND w_shipment TO i_shipment.
+      CLEAR w_shipment.
+    ENDIF.
+  ENDLOOP.
+
+  IF i_shipment[] IS NOT INITIAL.
+* Retrieve route, descrp of route
+* from TVROT
+* using full primary key: SPRAS ROUTE
+    SELECT route bezei
+      FROM tvrot
+      INTO TABLE i_tvrot
+       FOR ALL ENTRIES IN i_shipment
+     WHERE spras = sy-langu
+       AND route = i_shipment-route.
+    IF sy-subrc EQ 0.
+      SORT i_tvrot BY route bezei.
+    ENDIF.
+
+*start - D01K952807 on 04/07/09
+* Retrieve shipping type, descrp of shipping type
+* from T173T
+* using full primary key: SPRAS VSART
+    SELECT vsart bezei
+      FROM t173t
+      INTO TABLE i_t173t
+       FOR ALL ENTRIES IN i_shipment
+     WHERE spras = sy-langu
+     AND   vsart = i_shipment-vsart.
+    IF sy-subrc EQ 0.
+      SORT i_t173t BY vsart vsbezei.
+    ENDIF.
+*end - D01K952807 on 04/07/09
+  ENDIF.
+
+  LOOP AT i_shipment INTO w_shipment.
+* Get route, descrp of route from internal table
+    READ TABLE i_tvrot INTO w_tvrot
+         WITH KEY route = w_shipment-route
+         BINARY SEARCH
+         TRANSPORTING bezei.
+    IF sy-subrc EQ 0.
+      w_shipment-bezei = w_tvrot-bezei.
+      MODIFY i_shipment FROM w_shipment TRANSPORTING bezei.
+    ENDIF.
+
+*start - D01K952807 on 04/07/09
+* Get vsart, descrp of vsart from internal table
+    READ TABLE i_t173t INTO w_t173t
+         WITH KEY vsart = w_shipment-vsart
+         BINARY SEARCH
+         TRANSPORTING vsbezei.
+    IF sy-subrc EQ 0.
+      w_shipment-vsbezei = w_t173t-vsbezei.
+      MODIFY i_shipment FROM w_shipment TRANSPORTING vsbezei.
+    ENDIF.
+*end - D01K952807 on 04/07/09
+  ENDLOOP.
+* End add of D02K916816, (CR211867)
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/29/08
+* read for Forwarding Agent
+  PERFORM display_status USING 'Reading Forwarding Agent' 0.
+
+  REFRESH tmp_003.
+  tmp_003[] = i_zsdr075[].
+
+
+*& Begin Change - DP1K976029
+*  DELETE tmp_003 WHERE vgbel IS INITIAL.
+*  SORT tmp_003 BY vstel vgbel.
+*  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING vstel vgbel.
+*
+*  IF tmp_003[] IS NOT INITIAL.
+*    SELECT vstel vbeln spdnr
+*     INTO TABLE i_vepvg
+*     FROM vepvg
+*     FOR ALL ENTRIES IN tmp_003
+*     WHERE vstel = tmp_003-vstel
+*     AND   vbeln = tmp_003-vgbel.
+*
+*    SORT i_vepvg BY vstel vbeln.
+*    DELETE ADJACENT DUPLICATES FROM i_vepvg COMPARING vstel vbeln.
+*  ENDIF.
+
+  DELETE tmp_003 WHERE vbeln IS INITIAL.
+  SORT tmp_003 BY vbeln.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING vbeln.
+
+*& get "forwarding agent" from Sales Document Partner (VBPA)
+  IF tmp_003[] IS NOT INITIAL.
+    SELECT vbeln lifnr
+     INTO TABLE i_vbpa
+     FROM vbpa
+     FOR ALL ENTRIES IN tmp_003
+     WHERE vbeln = tmp_003-vbeln
+       AND parvw = 'SP'.
+
+    SORT i_vbpa BY vbeln.
+    DELETE ADJACENT DUPLICATES FROM i_vbpa COMPARING vbeln.
+  ENDIF.
+*& End Change - DP1K976029
+
+* read for Material Group
+  PERFORM display_status USING 'Reading Material Group' 0.
+
+  REFRESH tmp_003.
+  tmp_003[] = i_zsdr075[].
+
+  DELETE tmp_003 WHERE matnr IS INITIAL.
+  SORT tmp_003 BY matnr vkorg vtweg.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING matnr vkorg vtweg.
+
+  IF tmp_003[] IS NOT INITIAL.
+*    SELECT matnr vkorg vtweg mvgr4                        "D01K971394
+    SELECT matnr vkorg vtweg vmsta vmstd mvgr4              "D01K971394
+     INTO TABLE i_mvke
+     FROM mvke
+     FOR ALL ENTRIES IN tmp_003
+     WHERE matnr  = tmp_003-matnr
+     AND   vkorg  = tmp_003-vkorg
+     AND   vtweg  = tmp_003-vtweg.
+
+    SORT i_mvke BY matnr vkorg vtweg.
+    DELETE ADJACENT DUPLICATES FROM i_mvke COMPARING matnr vkorg vtweg.
+
+* Begin of change - D01K971394
+    SELECT * INTO CORRESPONDING FIELDS OF TABLE i_tvmst
+             FROM tvmst
+             WHERE spras = sy-langu.
+    SORT i_tvmst BY vmsta.
+* End of change - D01K971394
+  ENDIF.
+
+* read for Last Name of the record Creator
+  PERFORM display_status USING 'Reading Creator Details' 0.
+
+  REFRESH tmp_003.
+  tmp_003[] = i_zsdr075[].
+
+  DELETE tmp_003 WHERE ernam IS INITIAL.
+  SORT tmp_003 BY ernam.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING ernam.
+
+  IF tmp_003[] IS NOT INITIAL.
+    SELECT bname name_first name_last
+     INTO TABLE i_user
+     FROM user_addr
+     FOR ALL ENTRIES IN tmp_003
+     WHERE bname  = tmp_003-ernam.
+
+    SORT i_user BY bname.
+    DELETE ADJACENT DUPLICATES FROM i_user COMPARING bname.
+  ENDIF.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/29/08
+
+*& start - D01K951830 by G9008586 (W Kamal) on 02/13/09
+* read for Customer PO - at Item Level
+  PERFORM display_status USING 'Reading Customer PO' 0.
+
+  REFRESH tmp_003.
+  tmp_003[] = i_zsdr075[].
+
+  DELETE tmp_003 WHERE vbeln_va IS INITIAL.
+  DELETE tmp_003 WHERE posnr_va IS INITIAL.
+  SORT tmp_003 BY vbeln_va posnr_va.
+  DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING vbeln_va posnr_va.
+
+  IF tmp_003[] IS NOT INITIAL.
+    SELECT vbeln posnr bstkd
+     INTO TABLE i_vbkd
+     FROM vbkd
+     FOR ALL ENTRIES IN tmp_003
+     WHERE vbeln = tmp_003-vbeln_va
+     AND   posnr = tmp_003-posnr_va.
+
+    SORT i_vbkd BY vbeln posnr.
+    DELETE ADJACENT DUPLICATES FROM i_vbkd COMPARING vbeln posnr.
+
+    CLEAR i_vbkd_temp[].              "begin DP1K9A0CVJ
+    SELECT vbeln bstkd AS cust_bstkd
+      INTO CORRESPONDING FIELDS OF TABLE i_vbkd_temp
+      FROM vbkd
+      FOR ALL ENTRIES IN tmp_003
+      WHERE vbeln = tmp_003-vbeln_va
+      AND posnr = ''.
+
+    IF i_vbkd_temp[] IS NOT INITIAL.
+      SORT i_vbkd_temp BY vbeln.
+      DELETE ADJACENT DUPLICATES FROM i_vbkd_temp.
+      LOOP AT i_zsdr075 ASSIGNING FIELD-SYMBOL(<fs_zsdr075>).
+        READ TABLE i_vbkd_temp INTO w_vbkd
+              WITH KEY vbeln = <fs_zsdr075>-vbeln_va BINARY SEARCH.
+        <fs_zsdr075>-cust_bstkd = w_vbkd-cust_bstkd.
+      ENDLOOP.
+    ENDIF.                      "end DP1K9A0CVJ
+  ENDIF.
+*& end - D01K951830 by G9008586 (W Kamal) on 02/13/09
+
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+* Get delivery header status
+  IF i_zsdr075[] IS NOT INITIAL.
+    PERFORM display_status USING 'Reading Deliv. Credit Status' 0.
+
+    REFRESH tmp_003.
+    tmp_003[] = i_zsdr075[].
+    SORT tmp_003 BY vbeln.
+    DELETE ADJACENT DUPLICATES FROM tmp_003 COMPARING vbeln.
+    SELECT vbeln cmgst
+      FROM vbuk
+      INTO TABLE i_vbuk
+       FOR ALL ENTRIES IN tmp_003
+     WHERE vbeln = tmp_003-vbeln.
+    SORT i_vbuk BY vbeln.
+  ENDIF. "i_zsdr075[] IS NOT INITIAL
+
+* Get Reason Code Text (TVLS) - Select * to avoid additional processing
+  SELECT *
+    INTO TABLE i_tvlst
+    FROM tvlst
+   WHERE spras = sy-langu.
+  SORT i_tvlst BY lifsp.
+
+* Get Credit Status text
+  CALL FUNCTION 'J_3G_GET_DOMAENE_TEXT_ALL'
+    EXPORTING
+      domname           = 'CMGST'
+    TABLES
+      domvalue          = i_dd07t_cmgst
+    EXCEPTIONS
+      no_active_version = 1
+      no_entry_found    = 2
+      OTHERS            = 3.
+  SORT i_dd07t_cmgst BY domvalue_l.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+
+*Begin Of Changes By 100040001729 D01K9A0G6K
+  IF i_shipment[] IS NOT INITIAL.
+    SORT i_shipment BY vbeln.
+  ENDIF.
+*End Of Changes By 100040001729 D01K9A0G6K
+
+ENDFORM.                    " get_data
+*
+*&---------------------------------------------------------------------*
+*&      Form  merge
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM merge .
+
+  DATA: lw_kna1 LIKE LINE OF i_kna1.                        "D01K950731
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+  DATA: lw_vbuk        LIKE LINE OF i_vbuk,
+        lw_tvlst       LIKE LINE OF i_tvlst,
+        lw_tvlvt       LIKE LINE OF i_tvlvt,                "+DP1K928312
+        lw_dd07t_cmgst LIKE LINE OF i_dd07t_cmgst.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+* Begin of Insertion - DP1K928312
+  CONSTANTS:
+    lc_dash TYPE c LENGTH 1 VALUE '-'.
+* End of Insertion - DP1K928312
+
+  PERFORM display_status USING 'Merging data' 0.
+
+* USE VBEP AS THE DRIVER - ETENR HAS MULTIPLE RECORDS
+*  LOOP AT i_vbep.
+* CHECK NOT i_zsdr075[] IS NOT INITIAL.                             "D02K914217
+
+  LOOP AT i_zsdr075.
+*    CLEAR: i_vbup, i_likp, i_vepo, i_vekp.
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*    CLEAR: i_kna1, i_vekp, i_vepo.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+    CLEAR: i_kna1.                                          "+D01K957024
+*    CLEAR: lw_kna1, i_vepvg, i_mvke, i_user.               "D01K950731   DP1K976029
+    CLEAR: lw_kna1, i_vbpa, i_mvke, i_user.                 "DP1K976029
+    CLEAR: i_vbkd.                                          "D01K951830
+
+*    READ TABLE i_likp WITH KEY vgbel = i_vbep-vbeln
+*                               vgpos = i_vbep-posnr BINARY SEARCH.
+*    IF sy-subrc <> 0.
+*      DELETE i_vbep.
+*      CONTINUE.
+*    ENDIF.
+*
+*    READ TABLE i_vbup WITH KEY vbeln = i_likp-vbeln
+*                               posnr = i_likp-posnr BINARY SEARCH.
+*    IF sy-subrc <> 0.
+*      DELETE i_vbep.
+*      CONTINUE.
+*    ENDIF.
+
+*    READ TABLE i_kna1 WITH KEY kunnr = i_likp-kunnr BINARY SEARCH.
+    READ TABLE i_kna1 WITH KEY kunnr = i_zsdr075-kunnr BINARY SEARCH.
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+    IF i_zsdr075-kunag IS NOT INITIAL.
+      READ TABLE i_kna1 INTO lw_kna1
+                        WITH KEY kunnr = i_zsdr075-kunag BINARY SEARCH.
+    ENDIF.
+
+*& Begin Change - DP1K976029
+*    IF i_zsdr075-vgbel IS NOT INITIAL.
+*      READ TABLE i_vepvg WITH KEY vstel = i_zsdr075-vstel
+*                                  vbeln = i_zsdr075-vgbel BINARY SEARCH.
+*    ENDIF.
+
+    IF i_zsdr075-vbeln IS NOT INITIAL.
+      READ TABLE i_vbpa WITH KEY vbeln = i_zsdr075-vbeln BINARY SEARCH.
+    ENDIF.
+*& End Change - DP1K976029
+
+    IF i_zsdr075-matnr IS NOT INITIAL.
+      READ TABLE i_mvke WITH KEY  matnr = i_zsdr075-matnr
+                                  vkorg = i_zsdr075-vkorg
+                                  vtweg = i_zsdr075-vtweg
+                                  BINARY SEARCH.
+* Begin of change - D01K971394
+      IF i_mvke-vmsta NE s_tvmst-vmsta.
+        CLEAR s_tvmst.
+        IF i_mvke-vmsta IS NOT INITIAL.
+*         < 20 rows in PRD, binary search won't help
+          READ TABLE i_tvmst INTO s_tvmst
+                     WITH KEY vmsta = i_mvke-vmsta.
+        ENDIF.
+      ENDIF.
+* End of change - D01K971394
+    ENDIF.
+
+    IF i_zsdr075-ernam IS NOT INITIAL.
+      READ TABLE i_user WITH KEY  bname = i_zsdr075-ernam
+                                  BINARY SEARCH.
+    ENDIF.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+*& start - D01K951830 by G9008586 (W Kamal) on 02/13/09
+    IF i_zsdr075-vbeln IS NOT INITIAL AND
+       i_zsdr075-posnr IS NOT INITIAL.
+      READ TABLE i_vbkd WITH KEY  vbeln = i_zsdr075-vbeln_va
+                                  posnr = i_zsdr075-posnr_va
+                                  BINARY SEARCH.
+    ENDIF.
+    CHECK i_vbkd-bstkd IN s_bstkd.
+*& start - D01K951830 by G9008586 (W Kamal) on 02/13/09
+
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+    CLEAR lw_vbuk.
+    READ TABLE i_vbuk INTO lw_vbuk WITH KEY vbeln = i_zsdr075-vbeln
+                                           BINARY SEARCH.
+*   If indicator is marked, remove deliveries with block
+    IF p_delblk = c_x
+      AND ( lw_vbuk-cmgst = 'B'
+      OR lw_vbuk-cmgst = 'C'
+      OR lw_vbuk-cmgst = 'D' ).
+      CONTINUE.
+    ENDIF. "p_delblk = c_x
+
+*   Read credit status text
+    i_zsdr075-cmgst = lw_vbuk-cmgst.
+    READ TABLE i_dd07t_cmgst INTO lw_dd07t_cmgst WITH KEY
+                                  domvalue_l = i_zsdr075-cmgst
+                                  BINARY SEARCH.
+    IF sy-subrc = 0.
+      i_zsdr075-cmgst_text = lw_dd07t_cmgst-ddtext.
+    ENDIF.
+
+*   Read Reason code text
+    READ TABLE i_tvlst INTO lw_tvlst WITH KEY lifsp = i_zsdr075-lifsk
+                                              BINARY SEARCH.
+    IF sy-subrc = 0.
+      i_zsdr075-lifsk_text = lw_tvlst-vtext.
+    ENDIF.
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+
+* Begin of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*    READ TABLE i_vepo WITH KEY vbeln = i_zsdr075-vbeln
+*                               posnr = i_zsdr075-posnr BINARY SEARCH.
+*    IF sy-subrc = 0.
+*      READ TABLE i_vekp WITH KEY venum = i_vepo-venum BINARY SEARCH.
+*    ENDIF.
+*    IF i_vekp-exidv IN s_exidv.
+* End of comment D01K957024 on 05/25/2010 by WL Tham for JaniceA
+*      IF i_zsdr075-BMENG > 0.
+    MOVE i_zsdr075 TO i_out.
+    MOVE:
+*            i_vekp-exidv    TO i_out-exidv,        "-D01K957024
+*            i_vbep-edatu    TO i_out-edatu,
+*            i_vbep-etenr    TO i_out-etenr,
+*            i_vbep-bmeng    TO i_out-bmeng,
+*            i_vbep-bstnk    TO i_out-bstnk,
+*            i_vbep-vbeln_va TO i_out-vbeln_va,
+*            i_vbep-posnr_va TO i_out-posnr_va,
+*            i_vbup-wbsta    TO i_out-wbsta,
+*            i_vbup-kosta    TO i_out-kosta,
+*            i_likp-vbeln    TO i_out-vbeln,
+*            i_likp-lprio    TO i_out-lprio,
+*            i_likp-werks    TO i_out-werks,
+*            i_likp-vstel    TO i_out-vstel,
+*            i_likp-lgort    TO i_out-lgort,
+*            i_likp-erdat1   TO i_out-erdat1,
+*            i_likp-erdat2   TO i_out-erdat2,
+*            i_likp-wadat    TO i_out-wadat,
+*            i_likp-matnr    TO i_out-matnr,
+*            i_likp-lgpbe    TO i_out-lgpbe,
+*            i_likp-ernam    TO i_out-ernam,
+*            i_likp-lfimg    TO i_out-lfimg,
+*            i_likp-lfart    TO i_out-lfart,
+*            i_likp-posnr    TO i_out-posnr,
+*            i_likp-vgbel    TO i_out-vgbel,
+*            i_likp-vgpos    TO i_out-vgpos,
+*            i_likp-kunnr    TO i_out-kunnr,
+*            i_vepo-venum    TO i_out-venum,                "-D01K957024
+          i_out-inco1 TO i_out-inco1_d,                     "D01K959893
+          i_out-inco2 TO i_out-inco2_d,                     "D01K959893
+          i_kna1-name1    TO i_out-name1,
+          lw_kna1-name1   TO i_out-name2,                   "D01K950731
+*            i_vepo-vepos    TO i_out-vepos,                 "D01K950731 "-D01K957024
+*          i_vepvg-spdnr   TO i_out-spdnr,                   "D01K950731  "DP1K976029
+          i_vbpa-lifnr   TO i_out-spdnr,                   "D01K950731    "DP1K976029
+          i_user-name_last TO i_out-nachn,                  "D01K950731
+          i_mvke-mvgr4    TO i_out-mvgr4,                   "D01K950731
+          i_vbkd-bstkd    TO i_out-bstkd,                   "D01K951830
+* Begin of change - D01K971394
+          i_mvke-vmstd    TO i_out-vmstd.
+    IF i_mvke-vmsta IS NOT INITIAL.
+      CONCATENATE i_mvke-vmsta '-' s_tvmst-vmstb INTO i_out-vmstb
+                  SEPARATED BY space.
+    ENDIF.
+* End of change - D01K971394
+    CLEAR: i_out-inco1,                                     "D01K959893
+            i_out-inco2.
+
+*Start ADD DP1K908448 G9010249 11/02/2009
+*     Get sales office description, table I_TVKBT has been sorted above
+    READ TABLE i_tvkbt INTO w_tvkbt WITH KEY vkbur = i_zsdr075-vkbur
+    BINARY SEARCH TRANSPORTING bezei.
+
+    IF sy-subrc = 0.
+      i_out-vkbur_text = w_tvkbt-bezei.
+    ENDIF.
+*End ADD DP1K908448 G9010249 11/02/2009
+* Begin insert by Jai Ko : DP1K908978
+    SORT i_knvv BY kunnr vkorg vtweg spart.
+    READ TABLE i_knvv WITH KEY kunnr = i_zsdr075-kunnr
+                               vkorg = i_zsdr075-vkorg
+                               vtweg = i_zsdr075-vtweg
+                               spart = i_zsdr075-spart
+                               BINARY SEARCH.
+    IF sy-subrc = 0.
+      i_out-inco1 = i_knvv-inco1.
+      i_out-inco2 = i_knvv-inco2.
+    ENDIF.
+* End insert by Jai Ko : DP1K908978
+*Begin of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+*Overwrite unit price as NETPR is not reflective of UOM being used
+    CATCH SYSTEM-EXCEPTIONS arithmetic_errors = 1
+                            OTHERS            = 2.
+      i_zsdr075-netwr_ap = i_zsdr075-kzwi3 / i_zsdr075-kwmeng.
+    ENDCATCH.
+*If calculation successful, copy net value to be displayed. Else, original
+*value from vbap-netpr is used
+    IF sy-subrc = 0.
+      i_out-netwr_ap     = i_zsdr075-netwr_ap.
+    ENDIF.
+*End of change for EstherK by WL Tham(G9008257) on 09/23/2009 -DP1K906600
+
+*{    INSERT    Issue No. - 6366  07/16/2007    EX88845
+    PERFORM get_extended_price.
+*}    INSERT    Issue No. - 6366  07/16/2007    EX88845
+* Begin add of D02K916816, (CR211867)
+    READ TABLE i_shipment INTO w_shipment
+         WITH KEY vbeln = i_zsdr075-vbeln
+         BINARY SEARCH
+         TRANSPORTING tknum tndr_trkid bezei vsbezei. "D01K952807 on 04/07/2009
+    IF sy-subrc EQ 0.
+      MOVE: w_shipment-tknum TO i_out-tknum,
+            w_shipment-tndr_trkid TO i_out-tndr_trkid,
+*& start - D01K952807 by G9010248 (Eunise) on 03/20/09
+            w_shipment-vsbezei TO i_out-vsbezei,
+            w_shipment-bezei TO i_out-bezei.
+*& end - D01K952807 by G9010248 (Eunise) on 03/20/09
+    ENDIF.
+
+
+* Get the picking date and POD date from internal table
+    READ TABLE i_deliv INTO w_deliv
+         WITH KEY vbeln = i_zsdr075-vbeln
+         BINARY SEARCH
+         TRANSPORTING kodat podat.
+    IF sy-subrc EQ 0.
+      MOVE: w_deliv-kodat TO i_out-kodat,
+            w_deliv-podat TO i_out-podat.
+    ENDIF.
+
+    READ TABLE i_zsde004_05 INTO w_zsde004_05
+         WITH KEY vbeln = i_zsdr075-vbeln
+         BINARY SEARCH
+         TRANSPORTING manifestnum.
+    IF sy-subrc EQ 0.
+      MOVE w_zsde004_05-manifestnum TO i_out-manifestnum.
+    ENDIF.
+
+*& Begin Change - DP1K969749
+
+* Get Picked Date
+    READ TABLE i_vbfa INTO w_vbfa
+         WITH KEY vbelv = i_zsdr075-vbeln
+*                  posnv = i_zsdr075-posnr
+                  vbtyp_n = 'Q'
+         BINARY SEARCH
+         TRANSPORTING erdat.
+    IF sy-subrc EQ 0.
+      MOVE w_vbfa-erdat TO i_out-pickdt.
+    ENDIF.
+
+* Get Goods Movement Date
+    READ TABLE i_vbfa INTO w_vbfa
+         WITH KEY vbelv = i_zsdr075-vbeln
+*                  posnv = i_zsdr075-posnr
+                  vbtyp_n = 'R'
+         BINARY SEARCH
+         TRANSPORTING erdat.
+    IF sy-subrc EQ 0.
+      MOVE w_vbfa-erdat TO i_out-movedt.
+    ENDIF.
+*& End Change - DP1K969749
+
+*& Begin Change - DP1K971972
+* Get Ship-To Country
+    READ TABLE i_shipto_country INTO w_shipto_country
+         WITH KEY vbeln = i_zsdr075-vbeln
+*                  posnr = i_zsdr075-posnr
+         BINARY SEARCH
+         TRANSPORTING country.
+    IF sy-subrc EQ 0.
+      MOVE w_shipto_country-country TO i_out-country.
+    ENDIF.
+*& End Change - DP1K971972
+*& End Change - DP1K969749
+*& Begin Change - DP1K973763
+
+    IF i_ltap IS NOT INITIAL.                               "DP1K974368
+      READ TABLE i_ltap INTO w_ltap
+        WITH KEY vbeln = i_zsdr075-vbeln
+        BINARY SEARCH
+        TRANSPORTING tanum.
+      IF sy-subrc EQ 0.
+        MOVE w_ltap-tanum TO i_out-tanum.
+      ENDIF.
+    ENDIF.                                                  "DP1K974368
+*& End Change - DP1K973763
+
+    READ TABLE xlips INTO vlips
+         WITH KEY vbeln = i_zsdr075-vbeln
+                  posnr = i_zsdr075-posnr
+         BINARY SEARCH
+         TRANSPORTING vbeln posnr vtweg vgbel.
+    IF sy-subrc EQ 0.
+      CONCATENATE vlips-vbeln vlips-posnr INTO gv_name.
+* Get the external delivery text
+      CALL FUNCTION 'READ_TEXT'
+        EXPORTING
+          id                      = c_id
+          language                = sy-langu
+          name                    = gv_name
+          object                  = c_object
+        TABLES
+          lines                   = i_lines
+        EXCEPTIONS
+          id                      = 1
+          language                = 2
+          name                    = 3
+          not_found               = 4
+          object                  = 5
+          reference_check         = 6
+          wrong_access_to_archive = 7
+          OTHERS                  = 8.
+
+      IF sy-subrc = 0.
+* Populate the first line of text to the ALV grid
+        READ TABLE i_lines INDEX 1
+             TRANSPORTING tdline.
+        IF sy-subrc EQ 0.
+          MOVE i_lines-tdline TO i_out-zdelv_text.
+        ENDIF.
+
+        LOOP AT i_lines.
+          w_text-vbeln = vlips-vbeln.
+          w_text-lines = i_lines-tdline.
+          APPEND w_text TO i_text.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+* End add of D02K916816, (CR211867)
+* Begin of Insertion - DP1K928312
+    IF i_out-vkaus IS NOT INITIAL.
+      READ TABLE i_tvlvt
+        INTO lw_tvlvt
+        WITH KEY abrvw = i_out-vkaus
+        BINARY SEARCH.
+      IF sy-subrc EQ 0.
+        CONCATENATE i_out-vkaus lc_dash lw_tvlvt-bezei
+          INTO i_out-vkaus_dis
+          SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+* End of Insertion - DP1K928312
+    APPEND i_out.
+*      ENDIF.
+*    ENDIF.                                         "-D01K957024
+
+  ENDLOOP.
+
+* FREE UP SOME RESOURCES
+*  FREE: i_vbup, i_likp, i_vepo, i_vbep, i_vekp.    "-D01K957024
+  FREE: i_vbup, i_likp, i_vbep.                     "+D01K957024
+  FREE  i_knvv.                                             "DP1K908978
+* Begin add of D02K916816, (CR211867)
+* If shipment number entered in sel screen, remain
+* records that are in the search criteria
+  IF s_tknum IS NOT INITIAL.
+    DELETE i_out WHERE tknum NOT IN s_tknum.
+  ENDIF.
+
+* If FA tracking ID entered in sel screen, remain
+* records that are in the search criteria
+  IF s_track IS NOT INITIAL.
+    DELETE i_out WHERE tndr_trkid NOT IN s_track.
+  ENDIF.
+* End add of D02K916816, (CR211867)
+ENDFORM.                    " merge
+*&---------------------------------------------------------------------*
+*&      Form  display_data
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_data .
+  DATA:  i_fieldcat TYPE slis_t_fieldcat_alv WITH HEADER LINE.
+  DATA:  g_repid    LIKE sy-repid.                          "D01K926980
+  DATA: lv_save(1)  TYPE c VALUE 'A'.                       "D01K976509
+  PERFORM display_status USING 'Preparing to display' 0.
+
+** Begin EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = c_structure_name
+** End EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+*     I_CLIENT_NEVER_DISPLAY = 'X'
+*     I_INCLNAME             =
+*     I_BYPASSING_BUFFER     =
+*     I_BUFFER_ACTIVE        =
+    CHANGING
+      ct_fieldcat            = i_fieldcat[]
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+* HIDE THESE FIELDS FROM THE USER BUT ALLOW THEM TO BE ADDED
+  LOOP AT i_fieldcat.
+    CASE i_fieldcat-fieldname.
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+* commentted so these get displayed
+*      WHEN 'POSNR' OR 'VGBEL' OR 'VGPOS' OR 'KUNNR' OR 'VENUM'.
+*        i_fieldcat-no_out = 'X'.
+*        MODIFY i_fieldcat.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+** Begin EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+*      WHEN 'ERDAT1'.
+*        i_fieldcat-seltext_l = 'Delivery Create Date'.
+*        i_fieldcat-seltext_m = 'Del.Crt.Dt'.
+*        i_fieldcat-seltext_s = 'Del.Crt.Dt'.
+*        i_fieldcat-reptext_ddic = 'Del.Crt.Dt'.
+*        MODIFY icat from i_fieldcat.
+*      WHEN 'NAME1'.
+*        i_fieldcat-seltext_l = 'Ship to Party Name'.
+*        i_fieldcat-seltext_m = 'Ship to'.
+*        i_fieldcat-seltext_s = 'Ship to'.
+*        i_fieldcat-reptext_ddic = 'Ship to'.
+*        MODIFY icat from i_fieldcat.
+*      WHEN 'EDATU'.
+*        i_fieldcat-seltext_l = 'Customer Request Date'.
+*        i_fieldcat-seltext_m = 'Cst.Req.Dt'.
+*        i_fieldcat-seltext_s = 'Cst.Req.Dt'.
+*        i_fieldcat-reptext_ddic = 'Cst.Req.Dt'.
+*        MODIFY icat from i_fieldcat.
+*      WHEN 'VBELN'.
+*        i_fieldcat-seltext_l = 'Delivery Document'.
+*        i_fieldcat-seltext_m = 'Delivery'.
+*        i_fieldcat-seltext_s = 'Delivery'.
+*        i_fieldcat-reptext_ddic = 'Delivery'.
+*        MODIFY icat from i_fieldcat.
+*      WHEN 'WADAT'.
+*        i_fieldcat-seltext_l = 'Actual Goods Issue Date'.
+*        i_fieldcat-seltext_m = 'Ac.GI date'.
+*        i_fieldcat-seltext_s = 'Ac.GI date'.
+*        i_fieldcat-reptext_ddic = 'Ac.GI date'.
+*        MODIFY icat from i_fieldcat.
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+      WHEN 'KZWI1'.
+        i_fieldcat-no_out = 'X'.
+        i_fieldcat-seltext_l = 'PBP Gross Price'(008).
+        i_fieldcat-seltext_m = 'PBP GrsPrc'(009).
+        i_fieldcat-seltext_s = 'PBP GrsPrc'(009).
+        i_fieldcat-reptext_ddic = 'PBP GrsPrc'(009).
+        MODIFY i_fieldcat.
+
+      WHEN 'NAME2'.
+        i_fieldcat-seltext_l = 'Sold-To Party Name'(010).
+        i_fieldcat-seltext_m = 'Sold-To Name'(011).
+        i_fieldcat-seltext_s = 'Sold-To Nm'(012).
+        i_fieldcat-reptext_ddic = 'Sold-To Name'(011).
+        MODIFY i_fieldcat.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+*& start - D01K951261 by G9008586 (W Kamal) on 01/21/2009
+* to remove Confirmed Quantity from the ALV Report
+      WHEN 'BMENG'.
+        DELETE i_fieldcat.
+        CONTINUE.
+
+      WHEN 'NAME1'.
+        i_fieldcat-seltext_l = 'Ship-To Party Name'(013).
+        i_fieldcat-seltext_m = 'Ship-To Name'(014).
+        i_fieldcat-seltext_s = 'Ship-to Nm'(015).
+        i_fieldcat-reptext_ddic = 'Ship-to Name'(014).
+        MODIFY i_fieldcat.
+*& end - D01K951261 by G9008586 (W Kamal) on 01/21/2009
+
+      WHEN 'MATNR'.
+        i_fieldcat-no_out = 'X'.
+        MODIFY i_fieldcat.
+
+        i_fieldcat-intlen = '40'.
+        i_fieldcat-fieldname = 'MFRPN'.
+        i_fieldcat-seltext_l = 'Material Number'(016).
+        i_fieldcat-seltext_m = 'Material'(017).
+        i_fieldcat-seltext_s = 'Material'(017).
+        i_fieldcat-no_out = ' '.
+        APPEND i_fieldcat.
+
+** End EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+
+*{    INSERT    Issue No. - 6366  07/16/2007    EX88845
+      WHEN 'NETWR_AP'. " OR 'SHKZG_VA'. "D01K950731: SHKZG_VA -redisplayed
+        i_fieldcat-no_out = 'X'.
+        MODIFY i_fieldcat.
+
+      WHEN 'NETWR'.
+        i_fieldcat-no_out = 'X'.                            "D01K950731
+        i_fieldcat-seltext_l = 'Extended Price'(018).
+        i_fieldcat-seltext_m = 'Ext. Price'(019).
+        i_fieldcat-seltext_s = 'Ext. Price'(019).
+        i_fieldcat-reptext_ddic = 'Ext. Price'(019).
+        MODIFY i_fieldcat.
+*}    INSERT    Issue No. - 6366  07/16/2007    EX88845
+      WHEN 'VBELN'.
+        i_fieldcat-hotspot = c_x.
+        MODIFY i_fieldcat.
+
+*& start - D01K951567 by G9008586 (W Kamal) on 02/03/09
+      WHEN 'POSEX'.
+        i_fieldcat-seltext_l = 'PO Line Detail'(020).
+        i_fieldcat-seltext_m = 'PO Lin Det'(021).
+        i_fieldcat-seltext_s = 'PO Lin Det'(021).
+        i_fieldcat-reptext_ddic = 'PO Lin Det'(021).
+        MODIFY i_fieldcat.
+*& start - D01K951567 by G9008586 (W Kamal) on 02/03/09
+
+*& start - D01K951830 by G9008586 (W Kamal) on 02/13/09
+      WHEN 'BSTKD'.
+        i_fieldcat-seltext_l = 'Customer PO (Item Lvl)'(023).
+        i_fieldcat-seltext_m = 'PO (Item Lvl)'(022).
+        i_fieldcat-seltext_s = 'PO (Item Lvl)'(022).
+        i_fieldcat-reptext_ddic = 'PO (Item Lvl)'(022).
+        MODIFY i_fieldcat.
+*& end - D01K951830 by G9008586 (W Kamal) on 02/13/09
+
+*& start - D01K952807 by G9010248 (Eunise) on 03/20/09
+*&Change ALV grid display for column titled "Forwarding Agent" to read "FrghtFrwd"
+      WHEN 'SPDNR'.
+        i_fieldcat-seltext_l = 'Forwarding Agent'(024).
+        i_fieldcat-seltext_m = 'FrghtFrwd'(025).
+        i_fieldcat-seltext_s = 'FrghtFrwd'(025).
+        i_fieldcat-reptext_ddic = 'FrghtFrwd'(025).
+        MODIFY i_fieldcat.
+
+*Add column "Route" to display shipment route desc TVROT-BEZEI
+      WHEN 'BEZEI'.
+        i_fieldcat-seltext_l = 'Route'(028).
+        i_fieldcat-seltext_m = 'Route'(028).
+        i_fieldcat-seltext_s = 'Route'(028).
+        i_fieldcat-reptext_ddic = 'Route'(028).
+        MODIFY i_fieldcat.
+
+*Add column "Del. Method" to display shipment type desc T173T-BEZEI
+      WHEN 'VSBEZEI'.
+        i_fieldcat-seltext_l = 'Delivery Method'(026).
+        i_fieldcat-seltext_m = 'Delv Mthd'(027).
+        i_fieldcat-seltext_s = 'Delv Mthd'(027).
+        i_fieldcat-reptext_ddic = 'Delv Mthd'(027).
+        MODIFY i_fieldcat.
+*& end - D01K952807 by G9010248 (Eunise) on 03/20/09
+
+
+* Begin add of D02K916816, (CR211867)
+      WHEN c_etenr.
+        i_fieldcat-no_out = c_x.
+        MODIFY i_fieldcat.
+
+* start - D01K955374 by Lee Wen on 07/03/2009
+* comment off lines to output erdat2
+* start D01K955476 G9010249 07/09/2009
+      WHEN c_erdat2.
+        i_fieldcat-seltext_l = 'SO Created On'(029).
+        i_fieldcat-seltext_m = 'SO Created On'(029).
+        i_fieldcat-seltext_s = 'SO Created On'(029).
+        i_fieldcat-reptext_ddic = 'SO Created On'(029).
+        MODIFY i_fieldcat.
+* end D01K955476 G9010249 07/09/2009
+*       i_fieldcat-no_out = c_x.
+* end - D01K955374 by Lee Wen on 07/03/2009
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+* redisplayed as default
+*      WHEN c_nachn.
+*        i_fieldcat-no_out = c_x.
+*        MODIFY i_fieldcat.
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+      WHEN c_kodat.
+        i_fieldcat-seltext_l = TEXT-001.
+        i_fieldcat-seltext_m = TEXT-001.
+        i_fieldcat-seltext_s = TEXT-001.
+        i_fieldcat-reptext_ddic = TEXT-001.
+        i_fieldcat-outputlen = 17.                          "DP1K969749
+        MODIFY i_fieldcat.
+
+      WHEN c_cert.
+        i_fieldcat-seltext_l = TEXT-002.
+        i_fieldcat-seltext_m = TEXT-002.
+        i_fieldcat-seltext_s = TEXT-002.
+        i_fieldcat-reptext_ddic = TEXT-002.
+        MODIFY i_fieldcat.
+
+      WHEN c_manifest.
+        i_fieldcat-seltext_l = TEXT-003.
+        i_fieldcat-seltext_m = TEXT-003.
+        i_fieldcat-seltext_s = TEXT-003.
+        i_fieldcat-reptext_ddic = TEXT-003.
+        MODIFY i_fieldcat.
+
+      WHEN c_tknum.
+        i_fieldcat-seltext_l = TEXT-004.
+        i_fieldcat-seltext_m = TEXT-004.
+        i_fieldcat-seltext_s = TEXT-004.
+        i_fieldcat-reptext_ddic = TEXT-004.
+        MODIFY i_fieldcat.
+
+      WHEN c_trkid.
+        i_fieldcat-seltext_l = TEXT-005.
+        i_fieldcat-seltext_m = TEXT-005.
+        i_fieldcat-seltext_s = TEXT-005.
+        i_fieldcat-reptext_ddic = TEXT-005.
+        MODIFY i_fieldcat.
+
+      WHEN c_delv.
+        i_fieldcat-hotspot = c_x.
+        i_fieldcat-outputlen = c_outlen.
+        MODIFY i_fieldcat.
+* End add of D02K916816, (CR211867)
+*Start ADD DP1K908448 G9010249 11/02/2009
+      WHEN c_vkbur.
+        i_fieldcat-seltext_l = 'Sales Office'(030).
+        i_fieldcat-seltext_m = 'Sales Office'(030).
+        i_fieldcat-seltext_s = 'Sales Office'(030).
+        i_fieldcat-reptext_ddic = 'Sales Office'(030).
+        MODIFY i_fieldcat.
+      WHEN c_vkbur_text.
+        i_fieldcat-seltext_l = 'Sales Office Desc'(031).
+        i_fieldcat-seltext_m = 'Sales Office Desc'(031).
+        i_fieldcat-seltext_s = 'Sales Office Desc'(031).
+        i_fieldcat-reptext_ddic = 'Sales Office Desc'(031).
+        MODIFY i_fieldcat.
+*End ADD DP1K908448 G9010249 11/02/2009
+* Begin insert by Jai Ko : DP1K908978
+      WHEN 'INCO1'.
+        i_fieldcat-seltext_l = 'Incoterm'(032).
+        i_fieldcat-seltext_m = 'Incoterm'(032).
+        i_fieldcat-seltext_s = 'Incoterm'(032).
+        i_fieldcat-reptext_ddic = 'Incoterm'(032).
+        MODIFY i_fieldcat.
+      WHEN 'INCO2'.
+        i_fieldcat-seltext_l = 'Inco Desc'(033).
+        i_fieldcat-seltext_m = 'Inco Desc'(033).
+        i_fieldcat-seltext_s = 'Inco Desc'(033).
+        i_fieldcat-reptext_ddic = 'Inco Desc'(033).
+        MODIFY i_fieldcat.
+* End insert by Jai Ko : DP1K908978
+*Start ADD DP1K911229 G9010249 02/05/2010
+      WHEN 'MBDAT'.
+        i_fieldcat-no_out = c_x.
+        MODIFY i_fieldcat.
+*End ADD DP1K911229 G9010249 05/02/2010
+
+* Begin of change D01K957024 on 05/25/2010 by WL Tham for JaniceA
+* Remove Handling Unit fields from ALV Display
+      WHEN 'VENUM' OR 'VEPOS' OR 'EXIDV'.
+        DELETE i_fieldcat.
+* End of change D01K957024 on 05/25/2010 by WL Tham for JaniceA
+
+* Begin D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+      WHEN 'CMGST'.
+        i_fieldcat-seltext_l = 'Credit Chk'(040).
+        i_fieldcat-seltext_m = 'Credit Chk'(040).
+        i_fieldcat-seltext_s = 'Credit Chk'(040).
+        i_fieldcat-reptext_ddic = 'Credit Chk'(040).
+        MODIFY i_fieldcat.
+
+      WHEN 'CMGST_TEXT'.
+        i_fieldcat-seltext_l = 'Credit Chk Text'(041).
+        i_fieldcat-seltext_m = 'Credit Chk Text'(041).
+        i_fieldcat-seltext_s = 'Credit Chk Text'(041).
+        i_fieldcat-reptext_ddic = 'Credit Chk Text'(041).
+        MODIFY i_fieldcat.
+
+      WHEN 'LIFSK'.
+        i_fieldcat-seltext_l = 'Block Rsn'(042).
+        i_fieldcat-seltext_m = 'Block Rsn'(042).
+        i_fieldcat-seltext_s = 'Block Rsn'(042).
+        i_fieldcat-reptext_ddic = 'Block Rsn'(042).
+        MODIFY i_fieldcat.
+
+      WHEN 'LIFSK_TEXT'.
+        i_fieldcat-seltext_l = 'Block Rsn Text'(043).
+        i_fieldcat-seltext_m = 'Block Rsn Text'(043).
+        i_fieldcat-seltext_s = 'Block Rsn Text'(043).
+        i_fieldcat-reptext_ddic = 'Block Rsn Text'(043).
+        MODIFY i_fieldcat.
+
+* End D01K957290 by WL Tham(G9008257) on 06/01/10 for JaniceA
+*>>> Begin insert code D01K959893
+      WHEN 'INCO1_D'.
+        i_fieldcat-no_out = 'X'.
+        i_fieldcat-seltext_l = 'Dlvy Incoterm'(044).
+        i_fieldcat-seltext_m = 'Dlvy Incoterm'(044).
+        i_fieldcat-seltext_s = 'Dlvy Incoterm'(044).
+        i_fieldcat-reptext_ddic = 'Dlvy Incoterm'(044).
+        MODIFY i_fieldcat.
+      WHEN 'INCO2_D'.
+        i_fieldcat-no_out = 'X'.
+        i_fieldcat-seltext_l = 'Dlvy Inco Desc'(045).
+        i_fieldcat-seltext_m = 'Dlvy Inco Desc'(045).
+        i_fieldcat-seltext_s = 'Dlvy Inco Desc'(045).
+        i_fieldcat-reptext_ddic = 'Dlvy Inco Desc'(045).
+        MODIFY i_fieldcat.
+* <<< End insert code D01K959893
+
+* Add Freight Terms to output - CTD 02/24/11
+      WHEN 'SDABW'.
+        i_fieldcat-seltext_l = 'Frght Trms'(046).
+        i_fieldcat-seltext_m = 'Frght Trms'(046).
+        i_fieldcat-seltext_s = 'Frght Trms'(046).
+        i_fieldcat-reptext_ddic = 'Frght Trms'(046).
+        MODIFY i_fieldcat.
+* Begin of Change DP1K952418 J.Garcia
+      WHEN 'KVGR1'.
+        i_fieldcat-seltext_l = 'CustGrp1'(052).
+        i_fieldcat-seltext_m = 'CustGrp1'(052).
+        i_fieldcat-seltext_s = 'CustGrp1'(052).
+        i_fieldcat-reptext_ddic = 'CustGrp1'(052).
+        MODIFY i_fieldcat.
+* End of Change DP1K952418 J.Garcia
+* Begin of change - D01K963580
+      WHEN 'KVGR3'.
+        i_fieldcat-seltext_l = 'CustGrp3'(047).
+        i_fieldcat-seltext_m = 'CustGrp3'(047).
+        i_fieldcat-seltext_s = 'CustGrp3'(047).
+        i_fieldcat-reptext_ddic = 'CustGrp3'(047).
+        MODIFY i_fieldcat.
+* End of change - D01K963580
+
+* Begin of change - D01K971394
+      WHEN 'VMSTB'.
+        i_fieldcat-seltext_l = 'Material Status'(048).
+        i_fieldcat-seltext_m = 'Material Status'(048).
+        i_fieldcat-seltext_s = 'Material Status'(048).
+        i_fieldcat-reptext_ddic = 'Material Status'(048).
+        MODIFY i_fieldcat.
+      WHEN 'VMSTD'.
+        i_fieldcat-seltext_l = 'Mtl Status Valid From'(049).
+        i_fieldcat-seltext_m = 'Mtl Status Valid From'(049).
+        i_fieldcat-seltext_s = 'Mtl Status Valid From'(049).
+        i_fieldcat-reptext_ddic = 'Mtl Status Valid From'(049).
+        i_fieldcat-outputlen = 17.
+        MODIFY i_fieldcat.
+* End of change - D01K971394
+* Begin of Change - DP1K928312
+      WHEN 'VKAUS_DIS'.
+* text-050: Usage Indicator
+        i_fieldcat-seltext_l = TEXT-050.
+        i_fieldcat-seltext_m = TEXT-050.
+        i_fieldcat-seltext_s = TEXT-050.
+        i_fieldcat-reptext_ddic = TEXT-050.
+        MODIFY i_fieldcat.
+* End of Change - DP1K928312
+* Begin of change - DP1K930895
+      WHEN 'AUDAT'.
+        i_fieldcat-seltext_l = 'Sales Doc Item Date'(051).
+        i_fieldcat-seltext_m = 'Sales Doc Item Date'(051).
+        i_fieldcat-seltext_s = 'Sales Doc Item Date'(051).
+        i_fieldcat-reptext_ddic = 'Sales Doc Item Date'(051).
+        i_fieldcat-outputlen = 19.
+        MODIFY i_fieldcat.
+* End of change - DP1K930895
+
+*& Begin Change - DP1K969749
+      WHEN 'PICKDT'.
+        i_fieldcat-seltext_l = 'Picked Date'(053).
+        i_fieldcat-seltext_m = 'Picked Date'(053).
+        i_fieldcat-seltext_s = 'Picked Date'(053).
+        i_fieldcat-reptext_ddic = 'Picked Date'(053).
+        i_fieldcat-outputlen = 11.
+        MODIFY i_fieldcat.
+
+      WHEN 'MOVEDT'.
+        i_fieldcat-seltext_l = 'Goods Movement Date'(054).
+        i_fieldcat-seltext_m = 'Goods Movement Date'(054).
+        i_fieldcat-seltext_s = 'Goods Movement Date'(054).
+        i_fieldcat-reptext_ddic = 'Goods Movement Date'(054).
+        i_fieldcat-outputlen = 19.
+        MODIFY i_fieldcat.
+*& End Change - DP1K969749
+
+*& Begin Change - DP1K970783
+      WHEN 'AEDAT'.
+        i_fieldcat-seltext_l = 'Changed On Date'(055).
+        i_fieldcat-seltext_m = 'Changed On Date'(055).
+        i_fieldcat-seltext_s = 'Changed On Date'(055).
+        i_fieldcat-reptext_ddic = 'Changed On Date'(055).
+        i_fieldcat-outputlen = 15.
+        MODIFY i_fieldcat.
+*& End Change - DP1K970783
+
+*& Begin Change - DP1K971972
+      WHEN 'COUNTRY'.
+        i_fieldcat-seltext_l = 'Shipto Country'(056).
+        i_fieldcat-seltext_m = 'Shipto Country'(056).
+        i_fieldcat-seltext_s = 'Shipto Country'(056).
+        i_fieldcat-reptext_ddic = 'Shipto Country'(056).
+        i_fieldcat-outputlen = 14.
+        MODIFY i_fieldcat.
+*& End Change - DP1K971972
+*& Begin Change - DP1K973763
+      WHEN 'TANUM'.
+        i_fieldcat-seltext_l = 'Transfer Order'(057).
+        i_fieldcat-seltext_m = 'Transfer Order'(057).
+        i_fieldcat-seltext_s = 'Transfer Order'(057).
+        i_fieldcat-reptext_ddic = 'Transfer Order'(057).
+        i_fieldcat-outputlen = 14.
+        MODIFY i_fieldcat.
+*& End Change - DP1K973763
+
+*& Begin Change - D01K9A0BRO
+      WHEN 'ZZAIRCRAFT_LIPS'.
+        i_fieldcat-seltext_l = 'Aircraft Delivery'(058).
+        i_fieldcat-seltext_m = 'Aircraft Delivery'(058).
+        i_fieldcat-seltext_s = 'Aircraft Delivery'(058).
+        i_fieldcat-reptext_ddic = 'Aircraft Delivery'(058).
+        i_fieldcat-outputlen = 14.
+        MODIFY i_fieldcat.
+*& End Change - D01K9A0BRO
+
+      WHEN 'ZCOC_TEXT'.
+        i_fieldcat-seltext_l = TEXT-034.
+        i_fieldcat-seltext_m = TEXT-034.
+        i_fieldcat-seltext_s = TEXT-034.
+        i_fieldcat-reptext_ddic = TEXT-034.
+        i_fieldcat-no_out = 'X'.
+        i_fieldcat-tech = 'X'.
+        MODIFY i_fieldcat.
+
+      WHEN 'CUST_BSTKD'.                                    "DP1K9A0CVJ
+        i_fieldcat-seltext_l = TEXT-036.
+        i_fieldcat-seltext_m = TEXT-036.
+        i_fieldcat-seltext_s = TEXT-036.
+        i_fieldcat-reptext_ddic = TEXT-036.
+        MODIFY i_fieldcat.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDLOOP.
+
+
+*& start - D01K950731 by G9008586 (W Kamal) on 12/19/08
+* this is commentted as MPS date is now incorporated
+* directly to the DDIC structure
+*
+* Begin add of D02K918904, CR209067 at 06/18/08 (G9008190).
+*  i_fieldcat-fieldname = c_zzmpsdate.
+*  i_fieldcat-col_pos = 5.                                   "D01K950731
+*  i_fieldcat-seltext_l = text-007.
+*  i_fieldcat-seltext_m = text-007.
+*  i_fieldcat-seltext_s = text-007.
+*  i_fieldcat-outputlen = 10.
+*  i_fieldcat-no_zero   = 'X'.
+*  APPEND i_fieldcat.
+* End of D02K918904, CR209067 at 06/18/08 (G9008190).
+*
+*& end - D01K950731 by G9008586 (W Kamal) on 12/19/08
+
+
+** Begin EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+  LOOP AT i_out.
+    SELECT SINGLE mfrpn INTO i_out-mfrpn
+    FROM mara WHERE matnr = i_out-matnr.
+    IF i_out-mfrpn = ' '.
+      i_out-mfrpn = i_out-matnr.
+    ENDIF.
+
+    MODIFY i_out.
+  ENDLOOP.
+** End EX88886 (GWR00002-659) - 16 Jan 2006-D02K900230
+* Begin add of D02K916816, (CR211867)
+  w_alv_sort-spos      = 1.
+  w_alv_sort-fieldname = c_vbeln.
+  w_alv_sort-tabname   = c_table.
+  w_alv_sort-up        = c_x.
+  w_alv_sort-down      = space.
+  APPEND w_alv_sort TO i_alv_sort.
+  CLEAR w_alv_sort.
+* End add of D02K916816, (CR211867)
+
+  g_repid = sy-repid.
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*     I_INTERFACE_CHECK       = ' '
+      i_bypassing_buffer      = 'X'                  "D01K926980
+*     I_BUFFER_ACTIVE         = ' '
+      i_callback_program      = g_repid              "D01K926980
+*     I_CALLBACK_PF_STATUS_SET          = ' '
+      i_callback_user_command = 'USER_COMMAND'
+*     I_CALLBACK_TOP_OF_PAGE  = ' '
+*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*     I_CALLBACK_HTML_END_OF_LIST       = ' '
+*     i_structure_name        = 'ZSDR075'
+*     I_BACKGROUND_ID         = ' '
+*     I_GRID_TITLE            =
+*     I_GRID_SETTINGS         =
+*     IS_LAYOUT               =
+      it_fieldcat             = i_fieldcat[]
+*     IT_EXCLUDING            =
+*     IT_SPECIAL_GROUPS       =
+      it_sort                 = i_alv_sort        "D02K916816-ADD
+*     IT_FILTER               =
+*     IS_SEL_HIDE             =
+*     I_DEFAULT               = 'X'
+* Start of D01K976509
+*     i_save                  = 'U'                  "D01K926980
+      i_save                  = lv_save
+* End of D01K976509
+*     IS_VARIANT              =
+*     IT_EVENTS               =
+*     IT_EVENT_EXIT           =
+*     IS_PRINT                =
+*     IS_REPREP_ID            =
+*     I_SCREEN_START_COLUMN   = 0
+*     I_SCREEN_START_LINE     = 0
+*     I_SCREEN_END_COLUMN     = 0
+*     I_SCREEN_END_LINE       = 0
+*     IT_ALV_GRAPHICS         =
+*     IT_HYPERLINK            =
+*     IT_ADD_FIELDCAT         =
+*     IT_EXCEPT_QINFO         =
+*     I_HTML_HEIGHT_TOP       =
+*     I_HTML_HEIGHT_END       =
+* IMPORTING
+*     E_EXIT_CAUSED_BY_CALLER =
+*     ES_EXIT_CAUSED_BY_USER  =
+    TABLES
+      t_outtab                = i_out[]
+    EXCEPTIONS
+      program_error           = 1
+      OTHERS                  = 2.
+  IF sy-subrc <> 0.
+* MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+*         WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+ENDFORM.                    " display_data
+*&---------------------------------------------------------------------*
+*&      Form  f_vstel_auth_check
+*&---------------------------------------------------------------------*
+*       Authorization check for Shipping Point/Receiving Point
+*----------------------------------------------------------------------*
+*  -->  p_auth_fail        Authorization check failed
+*----------------------------------------------------------------------*
+FORM f_vstel_auth_check USING p_auth_fail TYPE c.
+  DATA: lv_vstel_exist TYPE c.  "Shipping Point/Receiving Point exist
+  DATA: BEGIN OF lit_vstel OCCURS 0,
+          vstel TYPE tvst-vstel,
+        END OF lit_vstel.
+
+  REFRESH: lit_vstel.
+  SELECT vstel INTO TABLE lit_vstel
+  FROM tvst
+  WHERE vstel IN s_vstel.
+*check selected vstel Shipping Point/Receiving Point exist
+  CLEAR: lv_vstel_exist.
+  IF NOT lit_vstel[] IS INITIAL.
+    lv_vstel_exist = 'X'.
+  ENDIF.
+  LOOP AT lit_vstel.
+    AUTHORITY-CHECK OBJECT 'Z_CRM'
+             ID 'ACTVT' FIELD '03'
+*              ID 'VKORG' FIELD '__________'
+             ID 'VSTEL' FIELD lit_vstel-vstel.
+*              ID 'VTWEG' FIELD '__________'.
+    IF sy-subrc NE 0.
+      DELETE lit_vstel.
+    ENDIF.
+  ENDLOOP.
+  IF lit_vstel[] IS INITIAL AND NOT lv_vstel_exist IS INITIAL.
+    MESSAGE i011.
+    "You do not have authorization for the selected objects.
+    p_auth_fail = 'X'.
+  ENDIF.
+  IF NOT lit_vstel[] IS INITIAL.
+    REFRESH: s_vstel.
+    LOOP AT lit_vstel.
+      CLEAR: s_vstel.
+      s_vstel-low = lit_vstel-vstel.
+      s_vstel-sign = 'I'.
+      s_vstel-option = 'EQ'.
+      APPEND s_vstel.
+    ENDLOOP.
+  ENDIF.
+ENDFORM.                    " f_vstel_auth_check
+*&---------------------------------------------------------------------*
+*&      Form  get_extended_price
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_extended_price .
+
+  DATA: lv_net_price TYPE netpr,
+        lv_del_qty   TYPE lfimg,
+        lv_shkzg     TYPE shkzg_va.
+
+  lv_net_price = i_zsdr075-netwr_ap.
+  lv_shkzg = i_zsdr075-shkzg_va.
+  lv_del_qty = i_zsdr075-lfimg.
+
+  i_out-netwr = lv_net_price * lv_del_qty.
+  IF lv_shkzg = 'S'.
+* reversal
+    i_out-netwr = i_out-netwr * -1.
+  ENDIF.
+
+ENDFORM.                    " get_extended_price
+*&---------------------------------------------------------------------*
+*&      Form  user_command
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->R_UCOMM    text
+*      -->SELFIELD   text
+*----------------------------------------------------------------------*
+FORM user_command USING r_ucomm  LIKE sy-ucomm
+                        selfield TYPE slis_selfield.
+
+  IF selfield-fieldname = 'VBELN'.
+    READ TABLE i_out  INDEX selfield-tabindex.
+    IF sy-subrc = 0.
+      SET PARAMETER ID 'VL' FIELD i_out-vbeln.
+      TRY.                                                                                       "$smart: #822
+        CALL TRANSACTION 'VL03N' WITH AUTHORITY-CHECK AND SKIP FIRST SCREEN.                     "$smart: #822
+      CATCH cx_sy_authorization_error INTO DATA(lx_auth_error).                                  "$smart: #822
+        CALL METHOD zcl_security_err_handle=>handle_error                                        "$smart: #822
+          EXPORTING                                                                              "$smart: #822
+            object_name = sy-repid                                                               "$smart: #822
+            action_code = zif_security_constants=>c_call_transaction                             "$smart: #822
+            keyname = zif_security_constants=>c_tcode                                            "$smart: #822
+            keyvalue = lx_auth_error->transaction_name                                           "$smart: #822
+          EXCEPTIONS                                                                             "$smart: #822
+            hard_error  = 1.                                                                     "$smart: #822
+        CASE sy-subrc.                                                                           "$smart: #822
+          WHEN 0.                                                                                "$smart: #822
+            CALL TRANSACTION 'VL03N' WITHOUT AUTHORITY-CHECK AND SKIP FIRST SCREEN.              "$smart: #822
+          WHEN 1.                                                                                "$smart: #822
+            MESSAGE e000(zsf) WITH zif_security_constants=>c_tcode                               "$smart: #822
+              lx_auth_error->transaction_name.                                                   "$smart: #822
+        ENDCASE.                                                                                 "$smart: #822
+      ENDTRY.                                                                                    "$smart: #822
+    ENDIF.
+
+*  CASE r_ucomm.
+*    WHEN c_errr.
+*      set parameter id 'BES' field i_ekpo-ebeln.
+*      call transaction 'ME22' and skip first screen.
+*  ENDCASE.
+* Begin add of D02K916816, (CR211867)
+  ELSEIF selfield-fieldname = c_delv.
+    READ TABLE i_out  INDEX selfield-tabindex
+      TRANSPORTING vbeln zdelv_text.
+    IF sy-subrc = 0.
+      LOOP AT i_text INTO w_text
+        WHERE vbeln = i_out-vbeln.
+        w_valuetab-lines = w_text-lines.
+        APPEND w_valuetab TO i_valuetab.
+      ENDLOOP.
+    ENDIF.
+
+    IF i_valuetab[] IS NOT INITIAL.
+      CALL FUNCTION 'POPUP_WITH_TABLE_DISPLAY_OK'
+        EXPORTING
+          endpos_col   = c_100
+          endpos_row   = c_15
+          startpos_col = c_18
+          startpos_row = c_10
+          titletext    = TEXT-006
+        TABLES
+          valuetab     = i_valuetab
+        EXCEPTIONS
+          break_off    = 1
+          OTHERS       = 2.
+
+      IF sy-subrc = 0.
+        CLEAR: i_valuetab, i_valuetab[].
+      ENDIF.
+    ENDIF.
+* End add of D02K916816, (CR211867)
+  ENDIF.
+
+ENDFORM.                    " user_command
+FORM auth_check_selopt_vkorg                                                                     "$smart: #826
+    TABLES t_fp_vkorg TYPE table.                                                                "$smart: #826
+  CONSTANTS: lc_auth_display TYPE activ_auth VALUE '03'.                                         "$smart: #826
+  IF t_fp_vkorg[] IS NOT INITIAL.                                                                "$smart: #826
+    CALL METHOD zcl_common_class=>check_auth_vkorg                                               "$smart: #826
+      EXPORTING                                                                                  "$smart: #826
+        im_activity = lc_auth_display                                                            "$smart: #826
+      IMPORTING                                                                                  "$smart: #826
+        et_dom_failed = DATA(et_dom_failed)                                                      "$smart: #826
+      CHANGING                                                                                   "$smart: #826
+        ch_s_vkorg  = t_fp_vkorg[]                                                               "$smart: #826
+      EXCEPTIONS                                                                                 "$smart: #826
+        ex_authority_failed = 1                                                                  "$smart: #826
+        others              = 2.                                                                 "$smart: #826
+    IF sy-subrc NE 0.                                                                            "$smart: #826
+      DATA t_params TYPE zsf_tty_name_value.                                                     "$smart: #826
+      t_params = VALUE #( FOR wa IN et_dom_failed ( name = zif_security_constants=>c_dom_vkorg   "$smart: #826
+        value = wa ) ).                                                                          "$smart: #826
+      CALL METHOD zcl_security_err_handle=>handle_error                                          "$smart: #826
+        EXPORTING                                                                                "$smart: #826
+          object_name = sy-repid                                                                 "$smart: #826
+          action_code = zif_security_constants=>c_auth_doma                                      "$smart: #826
+          keyname     = zif_security_constants=>c_dom_vkorg                                      "$smart: #826
+          t_params    = t_params                                                                 "$smart: #826
+        EXCEPTIONS                                                                               "$smart: #826
+          hard_error  = 1                                                                        "$smart: #826
+          others      = 2.                                                                       "$smart: #826
+        CASE sy-subrc.                                                                           "$smart: #826
+          WHEN 1.                                                                                "$smart: #826
+            MESSAGE e398(00) WITH 'No Authorization : VKORG'.                                    "$smart: #826
+        ENDCASE.                                                                                 "$smart: #826
+    ENDIF.                                                                                       "$smart: #826
+  ENDIF.                                                                                         "$smart: #826
+ENDFORM.                                                                                         "$smart: #826
